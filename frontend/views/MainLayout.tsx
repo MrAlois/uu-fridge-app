@@ -1,43 +1,90 @@
-import { AppLayout } from '@hilla/react-components/AppLayout.js';
-import { DrawerToggle } from '@hilla/react-components/DrawerToggle.js';
-import { useRouteMetadata } from 'Frontend/util/routing.js';
-import { Suspense, useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { AppLayout, type AppLayoutElement } from '@hilla/react-components/AppLayout.js';
+import React, {ReactNode, useEffect, useRef, useState} from 'react';
+import {Tab} from "@hilla/react-components/Tab";
+import {Tabs} from "@hilla/react-components/Tabs";
+import {Icon} from "@hilla/react-components/Icon";
+import {MenuBar} from "@hilla/react-components/MenuBar";
+import {HorizontalLayout} from "@hilla/react-components/HorizontalLayout";
+import {NavLink} from "react-router-dom";
+import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
+import {Button} from "@hilla/react-components/Button";
 
-const navLinkClasses = ({ isActive }: any) => {
-  return `block rounded-m p-s ${isActive ? 'bg-primary-10 text-primary' : 'text-body'}`;
+
+const headerStyle = {
+    fontSize: 'var(--lumo-font-size-l)',
+    margin: 'var(--lumo-space-m) var(--lumo-space-l)',
+    width: "100%"
+};
+
+const iconStyle = {
+    height: 'var(--lumo-icon-size-s)',
+    margin: 'auto',
+    width: 'var(--lumo-icon-size-s)',
+};
+
+const tabsStyle = {
+    width: '100%',
+    bottom: 0
+};
+
+type MainLayoutProps = {
+    children: ReactNode;
 };
 
 export default function MainLayout() {
-  const currentTitle = useRouteMetadata()?.title ?? 'My App';
-  useEffect(() => {
-    document.title = currentTitle;
-  }, [currentTitle]);
+    const appLayoutRef = useRef<AppLayoutElement>(null);
+    const [dialogOpened, setDialogOpened] = useState(false);
 
-  return (
-    <AppLayout primarySection="drawer">
-      <div slot="drawer" className="flex flex-col justify-between h-full p-m">
-        <header className="flex flex-col gap-m">
-          <h1 className="text-l m-0">My App</h1>
-          <nav>
-            <NavLink className={navLinkClasses} to="/">
-              Contacts
-            </NavLink>
-            <NavLink className={navLinkClasses} to="/about">
-              About
-            </NavLink>
-          </nav>
-        </header>
-      </div>
+    useEffect(() => {
+        const appLayout = appLayoutRef.current;
+        if (appLayout) {
+            // --vaadin-app-layout-touch-optimized is only enforced as part of this example
+            appLayout.style.setProperty('--vaadin-app-layout-touch-optimized', 'true');
+            (appLayout as any)._updateTouchOptimizedMode();
+        }
+    }, []);
 
-      <DrawerToggle slot="navbar" aria-label="Menu toggle"></DrawerToggle>
-      <h2 slot="navbar" className="text-l m-0">
-        {currentTitle}
-      </h2>
+    return (
+        <AppLayout ref={appLayoutRef}>
+            <header slot="navbar" style={headerStyle}>
+                <HorizontalLayout>
+                    Food Rescue Fridge App
+                </HorizontalLayout>
+            </header>
 
-      <Suspense>
-        <Outlet />
-      </Suspense>
-    </AppLayout>
-  );
-}
+            <ConfirmDialog
+                header="Are you sure?"
+                confirmText="Cancel"
+                opened={dialogOpened}
+                onOpenedChanged={(event) => setDialogOpened(event.detail.value)}
+                onConfirm={() => {
+                    console.log("Order Cancelled")
+                }}
+                onReject={() => {
+                    console.log("Discared")
+                }}
+            >
+                By cancelling you won't be able to do stuff.
+            </ConfirmDialog>
+
+            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs" style={tabsStyle}>
+                <Tab aria-label="Back">
+                    <NavLink to="/food-listings" tabIndex={-1}>
+                        <Icon icon="vaadin:arrow-circle-left" style={iconStyle}/>
+                    </NavLink>
+                </Tab>
+                <Tab aria-label="Create">
+                    <NavLink to="/add-listing" tabIndex={-1}>
+                        <Icon icon="vaadin:plus-circle" style={iconStyle}/>
+                    </NavLink>
+                </Tab>
+                <Tab aria-label="Cancel">
+                    <a onClick={() => setDialogOpened(true)} tabIndex={-1}>
+                        <Icon icon="vaadin:close-circle" style={iconStyle}/>
+                    </a>
+                </Tab>
+            </Tabs>
+        </AppLayout>
+    );
+};
+

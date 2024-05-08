@@ -1,20 +1,27 @@
-import ContactsView from 'Frontend/views/contacts/ContactsView.js';
-import MainLayout from 'Frontend/views/MainLayout.js';
-import { lazy } from 'react';
-import { createBrowserRouter, RouteObject } from 'react-router-dom';
+import {
+    createBrowserRouter, Navigate,
+    RouteObject
+} from "react-router-dom";
+import React from "react";
+import ListingDetailView from "Frontend/views/listing/ListingDetailView";
+import CreateListingView from "Frontend/views/listing/CreateListingView";
+import UserDetailView from "Frontend/views/user/UserDetailView";
+import MainLayout from "Frontend/views/MainLayout";
+import LoginView from "Frontend/views/login/LoginView";
+import ListingView from "Frontend/views/listing/ListingView";
 
-const AboutView = lazy(async () => import('Frontend/views/about/AboutView.js'));
+export const routes: readonly RouteObject[] = [
+    {
+        element: <MainLayout />,
+        children: [
+            { path: "/", element: <Navigate to="/food-listings" /> },
+            { path: "/food-listings", element: <ListingView /> },
+            { path: "/food-listings/:id", element: <ListingDetailView /> },
+            { path: "/add-listing", element: <CreateListingView />},
+            { path: "/profile", element: <UserDetailView />},
+            { path: "/login", element: <LoginView />}
+        ]
+    }
+];
 
-const routing = [
-  {
-    element: <MainLayout />,
-    handle: { title: 'Hilla CRM' },
-    children: [
-      { path: '/', element: <ContactsView />, handle: { title: 'Contacts' } },
-      { path: '/about', element: <AboutView />, handle: { title: 'About' } },
-    ],
-  },
-] as RouteObject[];
-
-export const routes = routing;
-export default createBrowserRouter(routes);
+export const router = createBrowserRouter([...routes], {basename: new URL(document.baseURI).pathname });

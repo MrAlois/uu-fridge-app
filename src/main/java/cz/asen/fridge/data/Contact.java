@@ -1,4 +1,4 @@
-package com.example.application.data;
+package cz.asen.fridge.data;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;

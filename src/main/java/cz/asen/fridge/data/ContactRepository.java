@@ -1,4 +1,4 @@
-package com.example.application.data;
+package cz.asen.fridge.data;
 
 
 import java.util.List;
