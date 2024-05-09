@@ -1,13 +1,12 @@
 import { AppLayout, type AppLayoutElement } from '@hilla/react-components/AppLayout.js';
-import React, {ReactNode, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Tab} from "@hilla/react-components/Tab";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {Icon} from "@hilla/react-components/Icon";
-import {MenuBar} from "@hilla/react-components/MenuBar";
 import {HorizontalLayout} from "@hilla/react-components/HorizontalLayout";
-import {NavLink} from "react-router-dom";
+import {NavLink, Outlet, Route, useLocation} from "react-router-dom";
 import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
-import {Button} from "@hilla/react-components/Button";
+import FoodListingCreateView from "Frontend/views/listing/FoodListingCreateView";
 
 
 const headerStyle = {
@@ -27,12 +26,10 @@ const tabsStyle = {
     bottom: 0
 };
 
-type MainLayoutProps = {
-    children: ReactNode;
-};
-
 export default function MainLayout() {
     const appLayoutRef = useRef<AppLayoutElement>(null);
+    const location = useLocation();
+
     const [dialogOpened, setDialogOpened] = useState(false);
 
     useEffect(() => {
@@ -53,8 +50,10 @@ export default function MainLayout() {
             </header>
 
             <ConfirmDialog
-                header="Are you sure?"
-                confirmText="Cancel"
+                header='Delete?'
+                cancelButtonVisible
+                confirmText="Delete"
+                confirmTheme="error primary"
                 opened={dialogOpened}
                 onOpenedChanged={(event) => setDialogOpened(event.detail.value)}
                 onConfirm={() => {
@@ -68,22 +67,32 @@ export default function MainLayout() {
             </ConfirmDialog>
 
             <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs" style={tabsStyle}>
-                <Tab aria-label="Back">
-                    <NavLink to="/food-listings" tabIndex={-1}>
-                        <Icon icon="vaadin:arrow-circle-left" style={iconStyle}/>
-                    </NavLink>
-                </Tab>
-                <Tab aria-label="Create">
-                    <NavLink to="/add-listing" tabIndex={-1}>
-                        <Icon icon="vaadin:plus-circle" style={iconStyle}/>
-                    </NavLink>
-                </Tab>
-                <Tab aria-label="Cancel">
-                    <a onClick={() => setDialogOpened(true)} tabIndex={-1}>
-                        <Icon icon="vaadin:close-circle" style={iconStyle}/>
-                    </a>
-                </Tab>
+                { location.pathname !== "/food-listings" && (
+                    <Tab aria-label="Back">
+                        <NavLink to="/food-listings" tabIndex={-1}>
+                            <Icon icon="vaadin:arrow-circle-left" style={iconStyle}/>
+                        </NavLink>
+                    </Tab>
+                )}
+
+                { location.pathname === "/food-listings" && (
+                    <Tab aria-label="Create">
+                        <NavLink to="/add-listing" tabIndex={-1}>
+                            <Icon icon="vaadin:plus-circle" style={iconStyle}/>
+                        </NavLink>
+                    </Tab>
+                )}
+
+                { location.pathname === "/food-listings/" && (
+                    <Tab aria-label="Cancel">
+                        <NavLink to="#" onClick={() => setDialogOpened(true)} tabIndex={-1}>
+                            <Icon icon="vaadin:close-circle" style={iconStyle}/>
+                        </NavLink>
+                    </Tab>
+                )}
             </Tabs>
+
+            <Outlet/>
         </AppLayout>
     );
 };

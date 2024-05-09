@@ -3,8 +3,8 @@
   "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
-    "@hilla/form": "2.5.5",
-    "@hilla/frontend": "2.5.5",
+    "@hilla/form": "^2.5.5",
+    "@hilla/frontend": "^2.5.5",
     "@hilla/generator-typescript-cli": "2.5.5",
     "@hilla/generator-typescript-core": "2.5.5",
     "@hilla/generator-typescript-plugin-backbone": "2.5.5",
@@ -15,10 +15,12 @@
     "@hilla/generator-typescript-plugin-subtypes": "2.5.5",
     "@hilla/generator-typescript-utils": "2.5.5",
     "@hilla/react-auth": "2.5.5",
-    "@hilla/react-components": "2.3.0",
+    "@hilla/react-components": "^2.3.0",
     "@hilla/react-crud": "2.5.5",
-    "@hilla/react-form": "2.5.5",
+    "@hilla/react-form": "^2.5.5",
     "@polymer/polymer": "3.5.1",
+    "@react-buddy/ide-toolbox": "^2.4.0",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "@vaadin/bundles": "24.3.0",
     "@vaadin/common-frontend": "0.0.19",
     "@vaadin/router": "1.7.5",
@@ -38,10 +40,13 @@
     "@vitejs/plugin-react": "4.2.0",
     "@vitejs/plugin-react-swc": "3.5.0",
     "async": "3.2.4",
+    "autoprefixer": "^10.4.19",
     "glob": "10.3.3",
+    "postcss": "^8.4.38",
     "rollup-plugin-brotli": "3.1.0",
     "rollup-plugin-visualizer": "5.9.2",
     "strip-css-comments": "5.0.0",
+    "tailwindcss": "^3.4.3",
     "transform-ast": "2.4.4",
     "typescript": "5.3.3",
     "vite": "5.0.6",
@@ -75,7 +80,9 @@
     "@hilla/generator-typescript-plugin-subtypes": "$@hilla/generator-typescript-plugin-subtypes",
     "@hilla/react-crud": "$@hilla/react-crud",
     "@hilla/generator-typescript-plugin-backbone": "$@hilla/generator-typescript-plugin-backbone",
-    "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli"
+    "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli",
+    "@react-buddy/ide-toolbox": "$@react-buddy/ide-toolbox",
+    "@tailwindcss/aspect-ratio": "$@tailwindcss/aspect-ratio"
   },
   "vaadin": {
     "dependencies": {
@@ -119,6 +126,6 @@
       "workbox-core": "7.0.0",
       "workbox-precaching": "7.0.0"
     },
-    "hash": "958b35b6da63ef31d2aefeb839cf3009bbcc4a884e493cc8b253fde5a4eaffef"
+    "hash": "e4565b659a0455ef9f104489d824f85a744416b736e2d290c5ee7416f46a5a71"
   }
 }

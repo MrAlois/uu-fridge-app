@@ -1,4 +1,4 @@
 @NonNullApi
-package cz.asen.fridge.services;
+package cz.asen.fridge.persistence;
 
 import org.springframework.lang.NonNullApi;

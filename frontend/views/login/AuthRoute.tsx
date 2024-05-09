@@ -3,7 +3,6 @@ import {AuthContext} from "@hilla/react-auth";
 import React, {useContext} from "react";
 
 function AuthRoute({ children }: { children: JSX.Element }) {
-    const navigate = useNavigate();
     const { state } = useContext(AuthContext); // Access isLoggedIn state
 
     if (!state.initializing) {
