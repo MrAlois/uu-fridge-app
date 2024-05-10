@@ -1,51 +1,37 @@
-# Custom project from Hilla
+# Food Rescue Fridge
 
-This project can be used as a starting point to create your own Hilla application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+This project, part of our coursework at Unicorn University, demonstrates how to create web applications using the Hilla framework, which is a powerful combination of Spring Boot for backend services and React for the frontend interface. This is my first project using Hilla, having previously worked with uug05, another favored framework at Unicorn University.
 
-## Running the application
 
-The project is a standard Maven project. To run it from the command line,
-type `mvnw` (Windows), or `./mvnw` (Mac & Linux), then open
-http://localhost:8080 in your browser.
+## Why Hilla (SpringBoot + React)?
 
-You can also import the project to your IDE of choice as you would with any
-Maven project.
+1. **Fast Iteration** - Hilla's hot-reload feature allows for quick changes without needing server restarts, thus improving developer experience and efficiency.
 
-## Deploying to Production
+2. **Strong Ecosystems** - Both Spring Boot and React have a wealth of resources, libraries, and support communities that can help you solve almost any problem you encounter during development.
 
-To create a production build, call `mvnw clean package -Pproduction` (Windows),
-or `./mvnw clean package -Pproduction` (Mac & Linux).
-This will build a JAR file with all the dependencies and front-end resources,
-ready to be deployed. The file can be found in the `target` folder after the build completes.
+3. **Variety of middleware** - Spring Boot's Spring ecosystem has a multitude of middleware options to choose from, making it easy to extend your application with various services.
 
-Once the JAR file is built, you can run it using
-`java -jar target/myapp-1.0-SNAPSHOT.jar` (NOTE, replace
-`myapp-1.0-SNAPSHOT.jar` with the name of your jar).
+4. **Reusability and Modularity** - React allows us to create modular and reusable components, leading to clean and maintainable codebases.
 
-## Project structure
+Even though SpringBoot with Thymeleaf and uu framework has served us well for previous projects, it's always good to master more tools and to be able to choose the best for each job.
 
-<table style="width:100%; text-align: left;">
-  <tr><th>Directory</th><th>Description</th></tr>
-  <tr><td><code>frontend/</code></td><td>Client-side source directory</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.html</code></td><td>HTML template</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.ts</code></td><td>Frontend 
-entrypoint, bootstraps a React application</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>routes.tsx</code></td><td>React Router routes definition</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>MainLayout.tsx</code></td><td>Main 
-layout component, contains the navigation menu, uses <a href="https://hilla.dev/docs/react/components/app-layout">
-App Layout</a></td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>views/</code></td><td>UI view 
-components</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>themes/</code></td><td>Custom  
-CSS styles</td></tr>
-  <tr><td><code>src/main/java/&lt;groupId&gt;/</code></td><td>Server-side 
-source directory, contains the server-side Java views</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>Application.java</code></td><td>Server entry-point</td></tr>
-</table>
+## Prerequisites
 
-## Useful links
+- Java SDK 21
+- Node.js v14+ and npm package manager
+- IntelliJ Idea or any preferred IDE with Jakarta EE, Spring Data JPA, Spring MVC, Lombok, and Kotlin support.
 
-- Read the documentation at [hilla.dev/docs](https://hilla.dev/docs/).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/hilla) or join our [Discord channel](https://discord.gg/MYFq5RTbBn).
-- Report issues, create pull requests in [GitHub](https://github.dev/hilla).
+## Installing and Running
+
+1. Clone this repository to your local machine using `git clone https://github.com/MrAlois/uu-fridge-app.git`
+2. Open the cloned project in your preferred IDE.
+3. Update project dependencies using npm with `npm install`
+4. To start the Spring Boot application, run `./gradlew bootRun` in the root directory of your projec (or use Spring Boot run config in IDEA Ultimate).
+
+## Authors
+
+[Alois Šenkyřík] - Initial work
+
+## Acknowledgments
+
+Thanks to Unicorn University for providing the opportunity to work on this challenging and engaging Hilla framework project, expanding my technical competencies and deepening my understanding of full-stack application development.
