@@ -1,6 +1,6 @@
 package cz.asen.fridge.domain;
 
-import cz.asen.fridge.domain.enums.DietaryRestriction;
+import cz.asen.fridge.domain.enums.Allergens;
 import cz.asen.fridge.persistence.entity.AppUserEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +22,7 @@ public record User(
         @Size(max = 64)
         String defaultLocation,
 
-        Set<DietaryRestriction> dietaryRestrictions,
+        Set<Allergens> allergens,
 
         @NotNull
         @Size(max = 64)

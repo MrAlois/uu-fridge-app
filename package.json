@@ -27,6 +27,7 @@
     "classnames": "^2.3.2",
     "construct-style-sheets-polyfill": "3.1.0",
     "lit": "3.1.0",
+    "promise-file-reader": "^1.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.2"
@@ -82,7 +83,8 @@
     "@hilla/generator-typescript-plugin-backbone": "$@hilla/generator-typescript-plugin-backbone",
     "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli",
     "@react-buddy/ide-toolbox": "$@react-buddy/ide-toolbox",
-    "@tailwindcss/aspect-ratio": "$@tailwindcss/aspect-ratio"
+    "@tailwindcss/aspect-ratio": "$@tailwindcss/aspect-ratio",
+    "promise-file-reader": "$promise-file-reader"
   },
   "vaadin": {
     "dependencies": {
@@ -126,6 +128,6 @@
       "workbox-core": "7.0.0",
       "workbox-precaching": "7.0.0"
     },
-    "hash": "e4565b659a0455ef9f104489d824f85a744416b736e2d290c5ee7416f46a5a71"
+    "hash": "635cd1adb37173d703484b6ef99b41738376bb9de9f4a828d7fbcf524d16f8e7"
   }
 }

@@ -1,9 +1,7 @@
 package cz.asen.fridge.service;
 
 import cz.asen.fridge.domain.User;
-import cz.asen.fridge.persistence.entity.AppUserEntity;
-import cz.asen.fridge.persistence.mapper.FoodListingDomainMapper;
-import cz.asen.fridge.persistence.mapper.UserDomainMapper;
+import cz.asen.fridge.persistence.mapper.DomainUserMapper;
 import cz.asen.fridge.persistence.repository.AppUserRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +17,11 @@ public class UserService {
 
     public Optional<User> findById(Integer id) {
         return appUserRepository.findById(id)
-                .map(UserDomainMapper::toDomain);
+                .map(DomainUserMapper::toDomain);
     }
 
     public Optional<User> findByName(String name) {
         return appUserRepository.findByNameIgnoreCase(name)
-                .map(UserDomainMapper::toDomain);
+                .map(DomainUserMapper::toDomain);
     }
 }

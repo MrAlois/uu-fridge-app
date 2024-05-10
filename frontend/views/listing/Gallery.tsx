@@ -1,11 +1,18 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 interface GalleryProps {
-    images?: string[]
+    images?: (string | undefined)[]
 }
 
 const Gallery = ({images = ['https://via.placeholder.com/360']} : GalleryProps) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
+
+    useEffect(() => {
+        if (images) {
+            images = images.filter((image): image is string => image !== undefined);
+        }
+    }, [images]);
+
     const handlePreviousClick = () => {
         setSelectedIndex((oldIndex) => oldIndex - 1);
     };

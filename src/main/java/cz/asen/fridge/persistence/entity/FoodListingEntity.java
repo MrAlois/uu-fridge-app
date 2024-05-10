@@ -1,7 +1,5 @@
 package cz.asen.fridge.persistence.entity;
 
-import cz.asen.fridge.domain.FoodListing;
-import cz.asen.fridge.domain.enums.ClaimState;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,10 +10,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -63,6 +57,6 @@ public class FoodListingEntity {
     private Instant created;
 
     @Size(max = 64)
-    @Column(name = "DIETARY_INFO", length = 64)
-    private String dietaryInfo;
+    @Column(name = "ALLERGENS", length = 64)
+    private String allergens;
 }

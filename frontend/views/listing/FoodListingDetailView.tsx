@@ -4,20 +4,6 @@ import FoodListing from "Frontend/generated/cz/asen/fridge/domain/FoodListing";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
 import {useParams} from "react-router-dom";
 
-interface ListingDetail {
-    id: string;
-    name: string;
-    image: string[];
-    createdAt: Date;
-    donorName: string;
-    donorEmail: string;
-    donorMobile: string;
-    expiryDate: Date;
-    pickupLocation: string;
-    dietaryProperties: string;
-    description: string;
-}
-
 export default function FoodListingDetailView() {
     const { listingId } = useParams()
     const [listing, setListing] = useState<FoodListing>()
@@ -54,7 +40,7 @@ export default function FoodListingDetailView() {
 
             <div className="py-2">
                 <h2 className="font-bold mb-2">Dietary Properties:</h2>
-                <p>{listing?.dietaryInfo.join(", ")}</p>
+                <p>{listing?.allergens?.join(", ")}</p>
             </div>
 
             <div className="py-2">

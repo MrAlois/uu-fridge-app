@@ -1,15 +1,13 @@
 package cz.asen.fridge.domain;
 
+import cz.asen.fridge.domain.enums.Allergens;
 import cz.asen.fridge.domain.enums.ClaimState;
-import cz.asen.fridge.domain.enums.DietaryRestriction;
 import cz.asen.fridge.persistence.entity.FoodListingEntity;
-import dev.hilla.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,7 +42,7 @@ public record FoodListing(
         LocalDateTime created,
 
         @NotNull
-        Set<DietaryRestriction> dietaryInfo,
+        Set<Allergens> allergens,
 
 //      Claim section
         @NotNull

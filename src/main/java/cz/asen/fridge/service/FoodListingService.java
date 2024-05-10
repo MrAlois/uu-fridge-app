@@ -1,18 +1,20 @@
 package cz.asen.fridge.service;
 
-import com.vaadin.flow.router.NotFoundException;
 import cz.asen.fridge.domain.FoodListing;
 import cz.asen.fridge.persistence.entity.FoodListingEntity;
-import cz.asen.fridge.persistence.mapper.FoodListingDomainMapper;
+import cz.asen.fridge.persistence.entity.FoodListingPhotoEntity;
+import cz.asen.fridge.persistence.mapper.DomainFoodListingMapper;
 import cz.asen.fridge.persistence.repository.FoodListingClaimRepository;
 import cz.asen.fridge.persistence.repository.FoodListingPhotoRepository;
 import cz.asen.fridge.persistence.repository.FoodListingRepository;
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FoodListingService {
@@ -38,6 +40,14 @@ public class FoodListingService {
                 .toList();
     }
 
+    public FoodListing createNewListing(FoodListing foodListing){
+        val entity = DomainFoodListingMapper.fromDomain(foodListing, null);
+
+        return Optional.of(foodListingRepository.save(entity))
+                .map(DomainFoodListingMapper::toDomain)
+                .orElseThrow();
+    }
+
     /**
      * Finds and fills the metadata of a FoodListing based on the given FoodListingEntity.
      *
@@ -47,6 +57,8 @@ public class FoodListingService {
     private @NotNull FoodListing findAndFillListingMetadata(@NotNull FoodListingEntity foodListing){
         final var foodListingClaimEntity = foodListingClaimRepository.findById(foodListing.getId()).orElse(null);
         final var foodListingPhotoEntities = foodListingPhotoRepository.findByListing_Id(foodListing.getId());
-        return FoodListingDomainMapper.toDomain(foodListing, foodListingClaimEntity, foodListingPhotoEntities);
+        return DomainFoodListingMapper.toDomain(foodListing, foodListingClaimEntity, foodListingPhotoEntities);
     }
+
+
 }

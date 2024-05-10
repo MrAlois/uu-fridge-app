@@ -8,7 +8,7 @@ create table APP_USER
     USER_ID              INTEGER auto_increment,
     NAME                 CHARACTER VARYING(64) not null,
     DEFAULT_LOCATION     CHARACTER VARYING(64),
-    DIETARY_RESTRICTIONS CHARACTER VARYING(128),
+    ALLERGIC_TO          CHARACTER VARYING(64),
     EMAIL                CHARACTER VARYING(64) not null,
     PHONE                CHARACTER VARYING(64),
     constraint USER_PK
@@ -25,7 +25,7 @@ create table FOOD_LISTING
     EXPIRY_DATE       TIMESTAMP                                       not null,
     PICKUP_LOCATION   CHARACTER VARYING(128)                          not null,
     CREATED           TIMESTAMP             default CURRENT_TIMESTAMP not null,
-    DIETARY_INFO      CHARACTER VARYING(64),
+    ALLERGENS         CHARACTER VARYING(64),
     constraint FOOD_LISTING_PK
         primary key (LISTING_ID),
     constraint FOOD_LISTING_APP_USER_USER_ID_FK

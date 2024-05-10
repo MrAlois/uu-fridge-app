@@ -1,18 +1,11 @@
 package cz.asen.fridge.persistence.entity;
 
-import cz.asen.fridge.domain.User;
-import cz.asen.fridge.domain.enums.DietaryRestriction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -34,9 +27,9 @@ public class AppUserEntity {
     @Column(name = "DEFAULT_LOCATION", length = 64)
     private String defaultLocation;
 
-    @Size(max = 128)
-    @Column(name = "DIETARY_RESTRICTIONS", length = 128)
-    private String dietaryRestrictions;
+    @Size(max = 64)
+    @Column(name = "ALLERGIC_TO", length = 128)
+    private String allergicTo;
 
     @Size(max = 64)
     @NotNull
