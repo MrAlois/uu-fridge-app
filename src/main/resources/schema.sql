@@ -1,9 +1,9 @@
-drop table if exists PUBLIC.FOOD_LISTING_CLAIM;
-drop table if exists PUBLIC.FOOD_LISTING_PHOTO;
-drop table if exists PUBLIC.FOOD_LISTING;
-drop table if exists PUBLIC.APP_USER;
+drop table if exists FOOD_LISTING_CLAIM;
+drop table if exists FOOD_LISTING_PHOTO;
+drop table if exists FOOD_LISTING;
+drop table if exists APP_USER;
 
-create table PUBLIC.APP_USER
+create table APP_USER
 (
     USER_ID              INTEGER auto_increment,
     NAME                 CHARACTER VARYING(64) not null,
@@ -15,12 +15,12 @@ create table PUBLIC.APP_USER
         primary key (USER_ID)
 );
 
-create table PUBLIC.FOOD_LISTING
+create table FOOD_LISTING
 (
     LISTING_ID        INTEGER auto_increment,
     DONOR_ID          INTEGER                                         not null,
     SHORT_DESCRIPTION CHARACTER VARYING(64)                           not null,
-    DESCRIPTION       CHARACTER VARYING(256)                          not null,
+    DESCRIPTION       CHARACTER VARYING(512)                          not null,
     QUANTITY          INTEGER                                         not null,
     EXPIRY_DATE       TIMESTAMP                                       not null,
     PICKUP_LOCATION   CHARACTER VARYING(128)                          not null,
@@ -32,7 +32,7 @@ create table PUBLIC.FOOD_LISTING
         foreign key (DONOR_ID) references APP_USER
 );
 
-create table PUBLIC.FOOD_LISTING_CLAIM
+create table FOOD_LISTING_CLAIM
 (
     CLAIM_ID   INTEGER auto_increment,
     USER_ID    INTEGER                                         not null,
@@ -47,7 +47,7 @@ create table PUBLIC.FOOD_LISTING_CLAIM
         foreign key (LISTING_ID) references FOOD_LISTING
 );
 
-create table PUBLIC.FOOD_LISTING_PHOTO
+create table FOOD_LISTING_PHOTO
 (
     PHOTO_ID   INTEGER auto_increment,
     LISTING_ID INTEGER             not null,

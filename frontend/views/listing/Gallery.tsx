@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import {useState} from 'react';
 
 interface GalleryProps {
-    images: string[]
+    images?: string[]
 }
 
-const Gallery = ({images} : GalleryProps) => {
+const Gallery = ({images = ['https://via.placeholder.com/360']} : GalleryProps) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
-
     const handlePreviousClick = () => {
         setSelectedIndex((oldIndex) => oldIndex - 1);
     };

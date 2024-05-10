@@ -6,14 +6,17 @@ spring:
     password:
   jpa:
     defer-datasource-initialization: true
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
   mustache:
     check-template-location: false
   devtools:
     restart:
       additional-exclude: 'dev/hilla/openapi.json'
+  h2:
+    console:
+      settings:
+        web-allow-others: true
 
 server:
   port: 8080

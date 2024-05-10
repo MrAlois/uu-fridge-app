@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Table(name = "APP_USER")
 public class AppUserEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    @SequenceGenerator(name = "idgenerator", initialValue = 10)
+    @SequenceGenerator(name = "generator", initialValue = 10)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "generator")
     @Column(name = "USER_ID", nullable = false)
     private Integer id;
 

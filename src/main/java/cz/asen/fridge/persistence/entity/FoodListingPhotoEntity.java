@@ -28,5 +28,5 @@ public class FoodListingPhotoEntity {
 
     @Lob
     @Column(name = "DATA", columnDefinition = "BINARY LARGE OBJECT not null")
-    private Blob data;
+    private String data;
 }

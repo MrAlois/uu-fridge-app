@@ -16,7 +16,7 @@ export const routes: readonly RouteObject[] = [
         children: [
             { path: "/", element: <Navigate to="/food-listings" /> },
             { path: "/food-listings", element: <FoodListingView /> },
-            { path: "/food-listings/:id", element: <FoodListingDetailView /> },
+            { path: "/food-listings/:listingId", element: <FoodListingDetailView /> },
             { path: "/add-listing", element: <FoodListingCreateView />},
             { path: "/profile", element: <UserDetailView />},
             { path: "/login", element: <LoginView />}

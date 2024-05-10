@@ -17,8 +17,8 @@ import java.time.Instant;
 @Table(name = "FOOD_LISTING_CLAIM")
 public class FoodListingClaimEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    @SequenceGenerator(name = "idgenerator", initialValue = 10)
+    @SequenceGenerator(name = "generator", initialValue = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
     @Column(name = "CLAIM_ID", nullable = false)
     private Integer id;
 

@@ -23,8 +23,8 @@ import java.util.Set;
 @Table(name = "FOOD_LISTING")
 public class FoodListingEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    @SequenceGenerator(name = "idgenerator", initialValue = 10)
+    @SequenceGenerator(name = "generator", initialValue = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
     @Column(name = "LISTING_ID", nullable = false)
     private Integer id;
 
@@ -41,7 +41,7 @@ public class FoodListingEntity {
 
     @Size(max = 256)
     @NotNull
-    @Column(name = "DESCRIPTION", nullable = false, length = 256)
+    @Column(name = "DESCRIPTION", nullable = false, length = 512)
     private String description;
 
     @NotNull
@@ -65,7 +65,4 @@ public class FoodListingEntity {
     @Size(max = 64)
     @Column(name = "DIETARY_INFO", length = 64)
     private String dietaryInfo;
-
-
-
 }

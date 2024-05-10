@@ -58,7 +58,7 @@ public record FoodListing(
 
 //      Image section
         @NotNull
-        Set<String> images
+        Set<String> base64Images
 
 ) implements Serializable {
 }

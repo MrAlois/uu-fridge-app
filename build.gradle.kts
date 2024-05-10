@@ -33,6 +33,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("dev.hilla:hilla-react-spring-boot-starter")
 	implementation("org.jetbrains:annotations:15.0")
+	implementation("commons-io:commons-io:2.16.1")
+
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")

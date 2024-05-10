@@ -6,8 +6,6 @@ import {Icon} from "@hilla/react-components/Icon";
 import {HorizontalLayout} from "@hilla/react-components/HorizontalLayout";
 import {NavLink, Outlet, Route, useLocation} from "react-router-dom";
 import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
-import FoodListingCreateView from "Frontend/views/listing/FoodListingCreateView";
-
 
 const headerStyle = {
     fontSize: 'var(--lumo-font-size-l)',

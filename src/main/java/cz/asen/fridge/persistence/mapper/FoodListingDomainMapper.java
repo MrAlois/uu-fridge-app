@@ -2,11 +2,12 @@ package cz.asen.fridge.persistence.mapper;
 
 import cz.asen.fridge.domain.FoodListing;
 import cz.asen.fridge.domain.enums.ClaimState;
-import cz.asen.fridge.persistence.entity.AppUserEntity;
+import cz.asen.fridge.domain.enums.DietaryRestriction;
 import cz.asen.fridge.persistence.entity.FoodListingClaimEntity;
 import cz.asen.fridge.persistence.entity.FoodListingEntity;
 import cz.asen.fridge.persistence.entity.FoodListingPhotoEntity;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,16 +17,14 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @UtilityClass
 public class FoodListingDomainMapper {
+    private static final String DIETARY_RESTRICTION_DELIMITER = ",";
 
-    @Contract("_, _ -> new")
     public static @NotNull FoodListing toDomain(
             @NotNull FoodListingEntity entity,
             FoodListingClaimEntity foodListingClaimEntity,
@@ -41,7 +40,7 @@ public class FoodListingDomainMapper {
                 LocalDateTime.ofInstant(entity.getExpiryDate(), ZoneId.systemDefault()),
                 entity.getPickupLocation(),
                 LocalDateTime.ofInstant(entity.getCreated(), ZoneId.systemDefault()),
-                Collections.emptySet(),
+                parseDietaryRestriction(entity.getDietaryInfo()),
                 maybeClaimEntity
                         .map(FoodListingClaimEntity::getState)
                         .map(ClaimState::valueOf)
@@ -54,18 +53,32 @@ public class FoodListingDomainMapper {
                         .map(instant -> LocalDateTime.ofInstant(instant, ZoneId.systemDefault())),
                 foodListingPhotoEntity.stream()
                         .map(FoodListingPhotoEntity::getData)
-                        .map(blob -> convertBlobToBase64(blob))
                         .collect(Collectors.toSet())
         );
     }
 
-    private static String convertBlobToBase64(@NotNull Blob blob)  {
-        try {
-            InputStream inputStream = blob.getBinaryStream();
-            byte[] bytes = inputStream.readAllBytes();
-            return Base64.getEncoder().encodeToString(bytes);
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Parses a string representation of dietary restrictions into a set of DietaryRestriction objects.
+     *
+     * @param dietaryRestrictions the string representation of dietary restrictions to parse
+     * @return the set of DietaryRestriction objects parsed from the input string
+     */
+    private static @NotNull Set<DietaryRestriction> parseDietaryRestriction(@NotNull String dietaryRestrictions){
+        return Arrays.stream(dietaryRestrictions.split(DIETARY_RESTRICTION_DELIMITER))
+                .filter(Objects::nonNull)
+                .map(String::strip)
+                .map(DietaryRestriction::valueOf)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * Parses the set of dietary restrictions into a comma-separated string.
+     *
+     * @param dietaryRestrictions the set of dietary restrictions to parse
+     * @return the comma-separated string of dietary restrictions
+     */
+    @Contract("_ -> new")
+    private static @NotNull String parseDietaryRestriction(@NotNull Set<DietaryRestriction> dietaryRestrictions){
+        return String.join(DIETARY_RESTRICTION_DELIMITER, dietaryRestrictions.stream().map(DietaryRestriction::name).toList());
     }
 }
