@@ -22,11 +22,11 @@ const Gallery = ({images = ['https://via.placeholder.com/360']} : GalleryProps) 
     };
 
     return (
-        <div className="relative group">
+        <div className="relative group h-60 md:h-96 flex justify-center items-center overflow-hidden">
             <img
                 src={images[selectedIndex]}
                 alt="selected"
-                className="object-cover w-full max-h-60 md:max-h-96"
+                className="w-auto h-full mx-auto object-cover object-center"
             />
 
             <div

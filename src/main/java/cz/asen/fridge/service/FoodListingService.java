@@ -4,10 +4,12 @@ import cz.asen.fridge.domain.FoodListing;
 import cz.asen.fridge.persistence.entity.FoodListingEntity;
 import cz.asen.fridge.persistence.entity.FoodListingPhotoEntity;
 import cz.asen.fridge.persistence.mapper.DomainFoodListingMapper;
+import cz.asen.fridge.persistence.mapper.DomainFoodListingPhotoMapper;
 import cz.asen.fridge.persistence.repository.FoodListingClaimRepository;
 import cz.asen.fridge.persistence.repository.FoodListingPhotoRepository;
 import cz.asen.fridge.persistence.repository.FoodListingRepository;
 import lombok.val;
+import org.checkerframework.checker.units.qual.radians;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +42,26 @@ public class FoodListingService {
                 .toList();
     }
 
+    public List<FoodListing> searchForListings(String query){
+        return foodListingRepository.findByShortDescriptionContainsOrPickupLocationContainsIgnoreCase(query, query).stream()
+                .map(this::findAndFillListingMetadata)
+                .toList();
+    }
+
     public FoodListing createNewListing(FoodListing foodListing){
         val entity = DomainFoodListingMapper.fromDomain(foodListing, null);
 
         return Optional.of(foodListingRepository.save(entity))
-                .map(DomainFoodListingMapper::toDomain)
+                .map(savedEntity -> {
+                    final var mappedFoodListing = DomainFoodListingMapper.toDomain(savedEntity,null,  foodListing.base64Images());
+                    final var mappedFoodPhoto = DomainFoodListingPhotoMapper.fromDomain(mappedFoodListing);
+                    foodListingPhotoRepository.saveAll(mappedFoodPhoto);
+                    return mappedFoodListing;
+                })
                 .orElseThrow();
     }
+
+
 
     /**
      * Finds and fills the metadata of a FoodListing based on the given FoodListingEntity.
@@ -56,9 +71,9 @@ public class FoodListingService {
      */
     private @NotNull FoodListing findAndFillListingMetadata(@NotNull FoodListingEntity foodListing){
         final var foodListingClaimEntity = foodListingClaimRepository.findById(foodListing.getId()).orElse(null);
-        final var foodListingPhotoEntities = foodListingPhotoRepository.findByListing_Id(foodListing.getId());
+        final var foodListingPhotoEntities = foodListingPhotoRepository.findByListing_Id(foodListing.getId()).stream()
+                .map(FoodListingPhotoEntity::getData)
+                .toList();
         return DomainFoodListingMapper.toDomain(foodListing, foodListingClaimEntity, foodListingPhotoEntities);
     }
-
-
 }

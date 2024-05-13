@@ -13,13 +13,13 @@ export default function FoodListingDetailView() {
     }, []);
 
     return (
-        <div className="p-4">
+        <div className="p-4 mx-auto max-w-4xl">
             <div className="flex justify-between items-start border-b pb-3 mb-3">
                 <h1 className="text-2xl overflow-wrap">{listing?.shortDescription}</h1>
                 <div className="text-xs text-gray-500">{new Date(listing?.created as string).toDateString()}</div>
             </div>
 
-            <Gallery images={listing?.base64Images} />
+            <Gallery images={listing?.base64Images}/>
 
             <div className="py-2">
                 <h2 className="font-bold mb-2">Donor Information:</h2>

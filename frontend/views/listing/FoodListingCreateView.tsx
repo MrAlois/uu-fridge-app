@@ -38,42 +38,45 @@ const FoodListingCreateView: React.FC = () => {
     ];
 
     return (
-        <section className="m-4 max-w-7xl">
-            <h1>Create listing</h1>
-            <VerticalLayout theme="spacing">
-                <FormLayout responsiveSteps={responsiveSteps}>
-                    <TextField label="Listing name" {...field(model.shortDescription)}/>
-                    <TextField label="Pickup location" {...field(model.pickupLocation)}/>
-                    <IntegerField label="Quantity" stepButtonsVisible min={1} max={9} {...field(model.quantity)}/>
-                    <DatePicker label="Expiration date" {...field(model.expiryDate)}/>
-                    <CheckboxGroup label="Dietary info" {...field(model.allergens)}>
-                        {allergens.map(option => (
-                            <Checkbox key={option} value={option} label={option}/>
-                        ))}
-                    </CheckboxGroup>
-                    <TextArea {...{colspan: 2}} label="Description" {...field(model.description)}/>
-                    <p>Images: </p>
-                    <Upload capture="camera" accept="image/*" onUploadBefore={
-                        async (e) => {
-                            const file = e.detail.file;
-                            e.preventDefault();
-                            if (value) {
-                                const base64Image = await readAsDataURL(file);
-                                if (value.base64Images) {
-                                    value.base64Images.push(base64Image);
-                                } else {
-                                    value.base64Images = [base64Image];
+        <section className="flex justify-center items-start px-5 py-10 md:px-40 md:py-20 min-h-screen">
+            <div className="max-w-7xl w-full">
+                <div className="mb-4 md:mb-8 flex items-center justify-between">
+                    <h1 className="text-lg md:text-2xl font-semibold">Create listing</h1>
+                </div>
+                <VerticalLayout theme="spacing">
+                    <FormLayout responsiveSteps={responsiveSteps}>
+                        <TextField label="Listing name" {...field(model.shortDescription)}/>
+                        <TextField label="Pickup location" {...field(model.pickupLocation)}/>
+                        <IntegerField label="Quantity" stepButtonsVisible min={0}  {...field(model.quantity)}/>
+                        <DatePicker label="Expiration date" {...field(model.expiryDate)}/>
+                        <CheckboxGroup label="Dietary info" {...field(model.allergens)}>
+                            {allergens.map(option => (
+                                <Checkbox key={option} value={option} label={option}/>
+                            ))}
+                        </CheckboxGroup>
+                        <TextArea {...{colspan: 2}} label="Description" {...field(model.description)}/>
+                        <p>Images: </p>
+                        <Upload capture="camera" accept="image/*" onUploadBefore={
+                            async (e) => {
+                                const file = e.detail.file;
+                                e.preventDefault();
+                                if (value) {
+                                    const base64Image = await readAsDataURL(file);
+                                    if (value.base64Images) {
+                                        value.base64Images.push(base64Image);
+                                    } else {
+                                        value.base64Images = [base64Image];
+                                    }
                                 }
                             }
-                        }
-                    }/>
-                </FormLayout>
-            </VerticalLayout>
-            <HorizontalLayout className="mt-8" theme="spacing">
+                        }/>
+                    </FormLayout>
+                </VerticalLayout>
                 <Button theme="primary" onClick={submit}>Create</Button>
-            </HorizontalLayout>
+
+            </div>
         </section>
-    );
+);
 
 };
 

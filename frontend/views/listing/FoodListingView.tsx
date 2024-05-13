@@ -1,18 +1,27 @@
 import React, {useEffect, useState} from "react";
 import Gallery from "Frontend/views/listing/Gallery";
 import {NavLink} from "react-router-dom";
-import FoodListingModel from "Frontend/generated/cz/asen/fridge/domain/FoodListingModel";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
 import FoodListing from "Frontend/generated/cz/asen/fridge/domain/FoodListing";
 
 export default function FoodListingView() {
     const [serverListings, setServerListings] = useState<FoodListing[]>([])
+    const [searchQuery, setSearchQuery] = useState<string>()
+
     useEffect(() => {
-        FoodListingEndpoint.getAllListings().then((result) => {
-            let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
-            setServerListings(listings as FoodListing[])
-        })
-    }, []);
+        if (searchQuery) {
+            FoodListingEndpoint.searchListings(searchQuery).then((result) => {
+                let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
+                setServerListings(listings as FoodListing[])
+            })
+        }
+        else {
+            FoodListingEndpoint.getAllListings().then((result) => {
+                let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
+                setServerListings(listings as FoodListing[])
+            })
+        }
+    }, [searchQuery]);
 
     function shortenText(input: string) {
         return input.length > 20 ? `${input.substring(0, 20)}...` : input;
@@ -21,30 +30,35 @@ export default function FoodListingView() {
     const truncate = (input: string | undefined) => input == null ? "" : shortenText(input);
 
     return (
-        <div className="mx-auto px-4 sm:px-0 w-full">
-            <input
-                className="w-full lg:max-w-2xl p-2 mt-6 mb-4 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                type="text"
-                placeholder="Search Listings..."
-            />
+        <div className="mx-auto px-4 sm:px-0 w-full lg:max-w-4xl">
+            <div className="flex justify-center">
+                <input
+                    className="w-full lg:w-2/3 p-2 mt-6 mb-4 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    type="text"
+                    placeholder="Search Listings..."
+                    onChange={e => setSearchQuery(e.target.value)}
+                />
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto">
                 {serverListings.map((listing: FoodListing) => (
                     <div key={listing.id}
-                         className="flex flex-col border overflow-hidden rounded-md items-stretch w-full max-w-xs p-4">
-                        <div className="flex justify-between">
+                         className="flex flex-col border overflow-hidden rounded-md items-stretch w-full max-w-xs p-4 mx-auto">
+                        <div className="flex justify-between mb-4">
                             <NavLink to={`/food-listings/${listing.id}`}>
                                 <h4 className="font-semibold">{truncate(listing.shortDescription)}</h4>
                             </NavLink>
                             <p className="text-sm text-gray-500">{new Date(listing?.created as string).toDateString()}</p>
                         </div>
 
-                        <Gallery images={listing?.base64Images} />
+                        <Gallery images={listing?.base64Images}/>
 
                         <div className="text-sm">
-                            <p className="mb-2"><strong>Donor:</strong> {listing?.donor?.name}</p>
-                            <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate as string).toDateString()}</p>
+                            <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donor?.name}</p>
+                            <p className="mb-2"><strong>Expires
+                                on:</strong> {new Date(listing?.expiryDate as string).toDateString()}</p>
                             <p className="mb-2"><strong>Address:</strong> {listing.pickupLocation}</p>
+                            <p className="mb-2"><strong>State:</strong> {listing.currentState}</p>
                         </div>
                     </div>
                 ))}

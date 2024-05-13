@@ -44,6 +44,11 @@ public class FoodListingEndpoint {
                 .collect(Collectors.toSet());
     }
 
+    @Nonnull
+    public List<FoodListing> searchListings(@Nonnull String query){
+        return foodListingService.searchForListings(query);
+    }
+
     public void createListing(@Nonnull @NotNull CreateListingRequest request){
         val foodListing = new FoodListing(
                 null,

@@ -33,7 +33,7 @@ public class DomainFoodListingMapper {
     public static @NotNull FoodListing toDomain(
             @NotNull FoodListingEntity entity,
             FoodListingClaimEntity foodListingClaimEntity,
-            @NotNull List<FoodListingPhotoEntity> foodListingPhotoEntity
+            @NotNull Collection<String> foodListingPhotos
     ) {
         final var maybeClaimEntity = Optional.ofNullable(foodListingClaimEntity);
         return new FoodListing(
@@ -56,9 +56,7 @@ public class DomainFoodListingMapper {
                 maybeClaimEntity
                         .map(FoodListingClaimEntity::getClaimed)
                         .map(instant -> LocalDateTime.ofInstant(instant, ZoneId.systemDefault())),
-                foodListingPhotoEntity.stream()
-                        .map(FoodListingPhotoEntity::getData)
-                        .collect(Collectors.toSet())
+                new HashSet<>(foodListingPhotos)
         );
     }
 
