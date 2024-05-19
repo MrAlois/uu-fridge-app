@@ -21,7 +21,6 @@ create table FOOD_LISTING
     DONOR_ID          INTEGER                                         not null,
     SHORT_DESCRIPTION CHARACTER VARYING(64)                           not null,
     DESCRIPTION       CHARACTER VARYING(512)                          not null,
-    QUANTITY          INTEGER                                         not null,
     EXPIRY_DATE       TIMESTAMP                                       not null,
     PICKUP_LOCATION   CHARACTER VARYING(128)                          not null,
     CREATED           TIMESTAMP             default CURRENT_TIMESTAMP not null,

@@ -33,7 +33,7 @@ public class DomainFoodListingMapper {
     public static @NotNull FoodListing toDomain(
             @NotNull FoodListingEntity entity,
             FoodListingClaimEntity foodListingClaimEntity,
-            @NotNull Collection<String> foodListingPhotos
+            Collection<String> foodListingPhotos
     ) {
         final var maybeClaimEntity = Optional.ofNullable(foodListingClaimEntity);
         return new FoodListing(
@@ -41,7 +41,6 @@ public class DomainFoodListingMapper {
                 DomainUserMapper.toDomain(entity.getDonor()),
                 entity.getShortDescription(),
                 entity.getDescription(),
-                entity.getQuantity(),
                 LocalDateTime.ofInstant(entity.getExpiryDate(), ZoneId.systemDefault()),
                 entity.getPickupLocation(),
                 LocalDateTime.ofInstant(entity.getCreated(), ZoneId.systemDefault()),
@@ -56,7 +55,7 @@ public class DomainFoodListingMapper {
                 maybeClaimEntity
                         .map(FoodListingClaimEntity::getClaimed)
                         .map(instant -> LocalDateTime.ofInstant(instant, ZoneId.systemDefault())),
-                new HashSet<>(foodListingPhotos)
+                foodListingPhotos != null ? new HashSet<>(foodListingPhotos) : Collections.emptySet()
         );
     }
 
@@ -70,7 +69,6 @@ public class DomainFoodListingMapper {
         entity.setDonor(DomainUserMapper.fromDomain(new User(1, null, null, null, null, null)));
         entity.setShortDescription(domain.shortDescription());
         entity.setDescription(domain.description());
-        entity.setQuantity(domain.quantity());
         entity.setExpiryDate(domain.expiryDate().toInstant(ZoneOffset.UTC));
         entity.setPickupLocation(domain.pickupLocation());
         entity.setCreated(domain.created().toInstant(ZoneOffset.UTC));

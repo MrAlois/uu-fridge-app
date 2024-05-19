@@ -3,7 +3,7 @@
 This project, part of our coursework at Unicorn University, demonstrates how to create web applications using the Hilla framework, which is a powerful combination of Spring Boot for backend services and React for the frontend interface. This is my first project using Hilla, having previously worked with uug05, another favored framework at Unicorn University.
 
 
-## Why Hilla (SpringBoot + React)?
+## Why Hilla (SpringBoot + React + TailwindCSS)?
 
 1. **Fast Iteration** - Hilla's hot-reload feature allows for quick changes without needing server restarts, thus improving developer experience and efficiency.
 

@@ -29,9 +29,6 @@ public record FoodListing(
         String description,
 
         @NotNull
-        Integer quantity,
-
-        @NotNull
         LocalDateTime expiryDate,
 
         @NotNull

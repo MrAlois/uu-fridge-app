@@ -11,13 +11,18 @@ import java.util.List;
 
 @Service
 public class FoodListingImageService {
-    private static final String BASE64_IMAGE_HEADER_REGEX = "^data:image/\\w+;base64,";
     private final FoodListingPhotoRepository foodListingPhotoRepository;
 
     public FoodListingImageService(FoodListingPhotoRepository foodListingPhotoRepository) {
         this.foodListingPhotoRepository = foodListingPhotoRepository;
     }
 
+    /**
+     * Saves a list of images associated with a food listing.
+     *
+     * @param listingId The ID of the food listing.
+     * @param base64Images The list of base64-encoded images.
+     */
     public void saveAllImages(Integer listingId, @NotNull List<String> base64Images){
         final var foodListing = new FoodListingEntity();
         foodListing.setId(listingId);

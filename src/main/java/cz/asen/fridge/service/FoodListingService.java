@@ -9,14 +9,12 @@ import cz.asen.fridge.persistence.repository.FoodListingClaimRepository;
 import cz.asen.fridge.persistence.repository.FoodListingPhotoRepository;
 import cz.asen.fridge.persistence.repository.FoodListingRepository;
 import lombok.val;
-import org.checkerframework.checker.units.qual.radians;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class FoodListingService {
@@ -43,12 +41,18 @@ public class FoodListingService {
     }
 
     public List<FoodListing> searchForListings(String query){
-        return foodListingRepository.findByShortDescriptionContainsOrPickupLocationContainsIgnoreCase(query, query).stream()
+        return foodListingRepository.findByShortDescriptionContainsIgnoreCaseOrPickupLocationContainsIgnoreCase(query, query).stream()
                 .map(this::findAndFillListingMetadata)
                 .toList();
     }
 
-    public FoodListing createNewListing(FoodListing foodListing){
+    /**
+     * Creates a new FoodListing and saves it to the database.
+     *
+     * @param foodListing The FoodListing to be created and saved
+     * @return The created FoodListing
+     */
+    public FoodListing saveListing(FoodListing foodListing){
         val entity = DomainFoodListingMapper.fromDomain(foodListing, null);
 
         return Optional.of(foodListingRepository.save(entity))
@@ -61,13 +65,15 @@ public class FoodListingService {
                 .orElseThrow();
     }
 
-
+    public void deleteListingById(int listingId) throws NoSuchElementException {
+        foodListingRepository.deleteById(listingId);
+    }
 
     /**
-     * Finds and fills the metadata of a FoodListing based on the given FoodListingEntity.
+     * Finds and fills the metadata for a FoodListing based on the given FoodListingEntity
      *
-     * @param foodListing The FoodListingEntity object to retrieve metadata from.
-     * @return The filled FoodListing object.
+     * @param foodListing The FoodListingEntity to find and fill the metadata for
+     * @return The filled FoodListing object with metadata
      */
     private @NotNull FoodListing findAndFillListingMetadata(@NotNull FoodListingEntity foodListing){
         final var foodListingClaimEntity = foodListingClaimRepository.findById(foodListing.getId()).orElse(null);

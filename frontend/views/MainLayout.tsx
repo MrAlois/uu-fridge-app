@@ -1,33 +1,39 @@
 import { AppLayout, type AppLayoutElement } from '@hilla/react-components/AppLayout.js';
-import React, {useEffect, useRef, useState} from 'react';
-import {Tab} from "@hilla/react-components/Tab";
-import {Tabs} from "@hilla/react-components/Tabs";
-import {Icon} from "@hilla/react-components/Icon";
-import {HorizontalLayout} from "@hilla/react-components/HorizontalLayout";
-import {NavLink, Outlet, Route, useLocation, useNavigate} from "react-router-dom";
-import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
-import {Button} from "@hilla/react-components/Button";
+import React, {useEffect, useRef} from 'react';
+import {Outlet} from "react-router-dom";
 import {MenuBar} from "@hilla/react-components/MenuBar";
 import {createRoot} from "react-dom/client";
+import {Icon} from "@hilla/react-components/Icon";
 
-const iconStyle = {
-    height: 'var(--lumo-icon-size-s)',
-    margin: 'auto',
-    width: 'var(--lumo-icon-size-s)',
-};
+function menuComponent(component: React.ReactNode) {
+    const container = document.createElement('vaadin-menu-bar-item');
+    createRoot(container).render(component);
+    return container;
+}
 
-const tabsStyle = {
-    width: '100%',
-    bottom: 0
-};
+function createMenuItem(iconName: string, text: string, isChild = false) {
+    const iconStyle: React.CSSProperties = {};
+    if (isChild) {
+        iconStyle.width = 'var(--lumo-icon-size-s)';
+        iconStyle.height = 'var(--lumo-icon-size-s)';
+        iconStyle.marginRight = 'var(--lumo-space-s)';
+    }
 
-const MenuContext = React.createContext(undefined);
+    let ariaLabel = '';
+    if (iconName === 'copy') {
+        ariaLabel = 'duplicate';
+    }
+
+    return menuComponent(
+        <>
+            <Icon icon={`vaadin:${iconName}`} style={iconStyle} aria-label={ariaLabel} />
+            {text}
+        </>
+    );
+}
 
 export default function MainLayout() {
     const appLayoutRef = useRef<AppLayoutElement>(null);
-    const location = useLocation();
-
-    const [dialogOpened, setDialogOpened] = useState(false);
 
     useEffect(() => {
         const appLayout = appLayoutRef.current;
@@ -38,42 +44,14 @@ export default function MainLayout() {
         }
     }, []);
 
-    // Header
-    function menuComponent(component: React.ReactNode) {
-        const container = document.createElement('vaadin-menu-bar-item');
-        createRoot(container).render(component);
-        return container;
-    }
-
-    function createItem(iconName: string, text: string, isChild = false) {
-        const iconStyle: React.CSSProperties = {};
-        if (isChild) {
-            iconStyle.width = 'var(--lumo-icon-size-s)';
-            iconStyle.height = 'var(--lumo-icon-size-s)';
-            iconStyle.marginRight = 'var(--lumo-space-s)';
-        }
-
-        let ariaLabel = '';
-        if (iconName === 'copy') {
-            ariaLabel = 'duplicate';
-        }
-
-        return menuComponent(
-            <>
-                <Icon icon={`vaadin:${iconName}`} style={iconStyle} aria-label={ariaLabel} />
-                {text}
-            </>
-        );
-    }
-
     const menuItems = [
         {
-            component: createItem('menu', ''),
+            component: createMenuItem('menu', ''),
             children: [
-                { component: createItem('user', 'Account', true) },
-                { component: createItem('notebook', 'My Claims', true) },
+                { component: createMenuItem('user', 'Account', true) },
+                { component: createMenuItem('notebook', 'My Claims', true) },
                 { component: 'hr' },
-                { component: createItem('sign-out', 'Logout', true) },
+                { component: createMenuItem('sign-out', 'Logout', true) },
             ],
         }
     ];
@@ -86,51 +64,9 @@ export default function MainLayout() {
                 </div>
             </header>
 
-            <ConfirmDialog
-                header='Delete?'
-                cancelButtonVisible
-                confirmText="Delete"
-                confirmTheme="error primary"
-                opened={dialogOpened}
-                onOpenedChanged={(event) => setDialogOpened(event.detail.value)}
-                onConfirm={() => {
-                    console.log("Order Cancelled")
-                }}
-                onReject={() => {
-                    console.log("Discared")
-                }}
-            >
-                By cancelling you won't be able to do stuff.
-            </ConfirmDialog>
-
-            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs" style={tabsStyle}>
-                {location.pathname !== "/food-listings" && (
-                    <Tab aria-label="Back">
-                        <NavLink to="/food-listings" tabIndex={-1}>
-                            <Icon icon="vaadin:arrow-circle-left" style={iconStyle}/>
-                        </NavLink>
-                    </Tab>
-                )}
-
-                {location.pathname === "/food-listings" && (
-                    <Tab aria-label="Create">
-                        <NavLink to="/add-listing" tabIndex={-1}>
-                            <Icon icon="vaadin:plus-circle" style={iconStyle}/>
-                        </NavLink>
-                    </Tab>
-                )}
-
-                {location.pathname === "/food-listings/" && (
-                    <Tab aria-label="Cancel">
-                        <NavLink to="#" onClick={() => setDialogOpened(true)} tabIndex={-1}>
-                            <Icon icon="vaadin:close-circle" style={iconStyle}/>
-                        </NavLink>
-                    </Tab>
-                )}
-            </Tabs>
-
             <Outlet/>
+
+            {/* TODO Ideally put action bar here if possible */}
         </AppLayout>
     );
 };
-

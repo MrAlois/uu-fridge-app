@@ -39,10 +39,6 @@ public class FoodListingEntity {
     private String description;
 
     @NotNull
-    @Column(name = "QUANTITY", nullable = false)
-    private Integer quantity;
-
-    @NotNull
     @Column(name = "EXPIRY_DATE", nullable = false)
     private Instant expiryDate;
 

@@ -17,10 +17,6 @@ public record CreateListingRequest(
         String description,
 
         @NotNull
-        @Positive
-        Integer quantity,
-
-        @NotNull
         LocalDate expiryDate,
 
         @NotBlank
