@@ -2,17 +2,20 @@ import React, {useEffect, useMemo, useState} from 'react';
 import Gallery from './Gallery';
 import FoodListing from "Frontend/generated/cz/asen/fridge/domain/FoodListing";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
-import {NavLink, useParams} from "react-router-dom";
+import {NavLink, useNavigate, useParams} from "react-router-dom";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
+import StateBadge from "Frontend/views/listing/StateBadge";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
 export default function FoodListingDetailView() {
     const { listingId } = useParams()
-    const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
+    const navigate = useNavigate()
+    const [removeDialogOpened, setRemoveDialogOpened] = useState(false);
+    const [unclaimDialogOpened, setUnclaimDialogOpened] = useState(false);
     const [listing, setListing] = useState<FoodListing>()
 
     useEffect(() => {
@@ -22,20 +25,30 @@ export default function FoodListingDetailView() {
     return (
         <>
             <ConfirmDialog
-                header='Delete?'
+                header='Remove listing'
                 cancelButtonVisible
                 confirmText="Delete"
                 confirmTheme="error primary"
-                opened={confirmDialogOpened}
-                onOpenedChanged={(event) => setConfirmDialogOpened(event.detail.value)}
-                onConfirm={() => {
-                    console.log("Order Cancelled")
-                }}
-                onReject={() => {
-                    console.log("Discard")
-                }}
+                opened={removeDialogOpened}
+                onOpenedChanged={(event) => setRemoveDialogOpened(event.detail.value)}
+                onConfirm={() =>
+                    FoodListingEndpoint.removeListing(Number(listingId)).then(r => navigate("/food-listings"))
+                }
             >
-                By cancelling you won't be able to do stuff.
+                <p>Are you sure you want to remove this listing?</p>
+            </ConfirmDialog>
+
+            <ConfirmDialog
+                header='Unclaim listing'
+                cancelButtonVisible
+                confirmText="Unclaim"
+                confirmTheme="error primary"
+                opened={unclaimDialogOpened}
+                onOpenedChanged={(event) => setUnclaimDialogOpened(event.detail.value)}
+                onConfirm={() => console.log("Order unclaimed")}
+            >
+                <p>If you're cancelling your claim, you should contact your donor. Are you sure?</p>
+                <p className="my-4"><span>Email: </span> <a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
             </ConfirmDialog>
 
             <div className="p-4 mx-auto max-w-4xl">
@@ -46,38 +59,89 @@ export default function FoodListingDetailView() {
 
                 <Gallery images={listing?.base64Images}/>
 
-                <div className="py-2">
-                    <h2 className="font-bold mb-2">Donor Information:</h2>
-                    <p>Name: {listing?.donor?.name}</p>
-                    <p>Email: <a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
-                    <p>Mobile: {listing?.donor?.phone}</p>
-                </div>
+                <section>
+                    <table className="table-fixed w-full h-full mt-5">
+                        <tbody>
 
-                <div className="py-2">
-                    <h2 className="font-bold mb-2">Expires On:</h2>
-                    <p>{new Date(listing?.expiryDate as string).toDateString()}</p>
-                </div>
+                        <tr className="border-b">
+                            <td className="w-1/4 py-2"><strong>Listing state:</strong></td>
+                            <td className="w-3/4 py-2">
+                                <StateBadge state={listing?.currentState}/>
+                                {listing?.donor?.id && (
+                                    <span className="mx-4" {...{theme: 'badge success'}}>This is your listing!</span>
+                                )}
+                            </td>
+                        </tr>
 
-                <div className="py-2">
-                    <h2 className="font-bold mb-2">Pickup Location:</h2>
-                    <p>{listing?.pickupLocation}</p>
-                </div>
+                        <tr className="border-b">
+                            <td className="w-1/4 py-2"><strong>Donor Name:</strong></td>
+                            <td className="w-3/4 py-2">{listing?.donor?.name}</td>
+                        </tr>
 
-                <div className="py-2">
-                    <h2 className="font-bold mb-2">Dietary Properties:</h2>
-                    <p>{listing?.allergens != null ? listing?.allergens?.join(", ") : "NONE"}</p>
-                </div>
+                        <tr className="border-b">
+                            <td className="w-1/4 py-2"><strong>Donor Contacts:</strong></td>
+                            <td className="w-3/4 py-2">
+                                <p><a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
+                                <p>{listing?.donor?.phone}</p>
+                            </td>
+                        </tr>
 
-                <div className="py-2">
-                    <h2 className="font-bold mb-2">Description:</h2>
-                    <p>{listing?.description}</p>
-                </div>
+                        <tr className="border-b">
+                            <td className="w-1/4 py-2"><strong>Pickup Location:</strong></td>
+                            <td className="w-3/4 py-2">
+                                <p>{listing?.pickupLocation}</p>
+                            </td>
+                        </tr>
+
+                        {listing?.allergens?.length !== 0 && (
+                            <tr className="border-b">
+                                <td className="w-1/4 py-2"><strong>Dietary Properties:</strong></td>
+                                <td className="w-3/4 py-2"> {listing?.allergens?.join(", ")}</td>
+                            </tr>
+                        )}
+
+                        <tr className="border-b">
+                            <td className="w-1/4 py-2"><strong>Description:</strong></td>
+                            <td className="w-3/4 py-2">
+                                <p>{listing?.description}</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </section>
+                {listing?.currentClaimingUser && listing?.currentState === "CLAIMED" && (
+                    <section className="my-10">
+                        <span className="text-">fafa</span>
+                        <table className="table-fixed w-full h-full mt-5">
+                            <tbody>
+                            <tr className="border-b">
+                                <td className="w-1/4 py-2"><strong>Name:</strong></td>
+                                <td className="w-3/4 py-2">{listing.currentClaimingUser.name}</td>
+                            </tr>
+
+                            <tr className="border-b">
+                                <td className="w-1/4 py-2"><strong>Contact:</strong></td>
+                                <td className="w-3/4 py-2">
+                                    <p><a href={`mailto:${listing.currentClaimingUser.email}`}>{listing.currentClaimingUser.email}</a></p>
+                                    <p>{listing.currentClaimingUser.phone}</p>
+                                </td>
+                            </tr>
+
+                            <tr className="border-b">
+                                <td className="w-1/4 py-2"><strong>Claimed At:</strong></td>
+                                <td className="w-3/4 py-2">{listing.claimTime}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                )}
             </div>
 
-            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs" className="w-full bottom-0 lg:flex lg:justify-center lg:gap-6">
+            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs"
+                  className="w-full bottom-0 lg:flex lg:justify-center lg:gap-6">
                 <Tab aria-label="Back">
                     <NavLink to="/food-listings" tabIndex={-1}>
-                        <Icon icon="vaadin:arrow-circle-left" className={iconStyle}/>
+                    <Icon icon="vaadin:arrow-circle-left" className={iconStyle}/>
                     </NavLink>
                 </Tab>
 
@@ -94,7 +158,7 @@ export default function FoodListingDetailView() {
                 </Tab>
 
                 <Tab aria-label="Cancel">
-                    <NavLink to="#" onClick={() => setConfirmDialogOpened(true)} tabIndex={-1}>
+                    <NavLink to="#" onClick={() => setRemoveDialogOpened(true)} tabIndex={-1}>
                         <Icon icon="vaadin:close-circle" className={iconStyle}/>
                     </NavLink>
                 </Tab>

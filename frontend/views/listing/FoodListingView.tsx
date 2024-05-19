@@ -10,6 +10,7 @@ import {TextField} from "@hilla/react-components/TextField";
 import {Select} from "@hilla/react-components/Select";
 import {truncateText} from "Frontend/util/text-utils";
 import Distance from "Frontend/generated/cz/asen/fridge/domain/enums/Distance";
+import StateBadge from "Frontend/views/listing/StateBadge";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -82,7 +83,7 @@ export default function FoodListingView() {
                                 <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donor?.name}</p>
                                 <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate as string).toDateString()}</p>
                                 <p className="mb-2"><strong>Address:</strong> {listing.pickupLocation}</p>
-                                <p className="mb-2"><strong>State:</strong> {listing.currentState}</p>
+                                <p className="mb-2"><strong>State:</strong> <StateBadge state={listing.currentState}/></p>
                             </div>
                         </div>
                     ))}

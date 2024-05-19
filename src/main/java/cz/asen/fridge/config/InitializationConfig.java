@@ -33,7 +33,7 @@ public class InitializationConfig {
                             imageList.stream().map(String::length).reduce(0, Integer::sum)
                     );
 
-                    imageService.saveAllImages(listingId, imageList);
+                    imageService.saveAllBase64lImages(listingId, imageList);
                 });
     }
 

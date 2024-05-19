@@ -28,11 +28,11 @@ public class DomainAllergenMapper {
         return Arrays.stream(allergens.split(DIETARY_RESTRICTION_DELIMITER))
                 .filter(Objects::nonNull)
                 .map(String::strip)
-                .map(alergen -> {
+                .map(allergen -> {
                     try {
-                        return Allergens.valueOf(alergen);
+                        return Allergens.valueOf(allergen);
                     } catch (IllegalStateException e){
-                        log.warn("Can't parse Allergen of type '{}'", alergen);
+                        log.warn("Can't parse Allergen of type '{}'", allergen);
                         return null;
                     }
                 })

@@ -1,9 +1,9 @@
 -- insert data into APP_USER table
 INSERT INTO APP_USER(NAME, DEFAULT_LOCATION, ALLERGIC_TO, EMAIL, PHONE)
-VALUES ('John Smith', 'Location A', 'NONE', 'johnsmith@email.com', '1234567890'),
+VALUES ('John Smith', 'Location A', null, 'johnsmith@email.com', '1234567890'),
        ('Jane Doe', 'Location B', 'NUTS', 'janedoe@email.com', '2345678901'),
        ('Mary Johnson', 'Location C', 'MILK,EGGS', 'maryjohnson@email.com', '3456789012'),
-       ('Robert Brown', 'Location D', 'NONE', 'robertbrown@email.com', '4567890123'),
+       ('Robert Brown', 'Location D', null, 'robertbrown@email.com', '4567890123'),
        ('Emma Wilson', 'Location B', 'MILK', 'emmawilson@email.com', '5678901234');
 
 -- insert data into FOOD_LISTING table
@@ -18,6 +18,6 @@ VALUES (1, 'Veg Salad', 'The name gives an illusion of something healthy but in 
 INSERT INTO FOOD_LISTING_CLAIM(USER_ID, LISTING_ID, STATE)
 VALUES (1, 2, 'WAITING'),
        (2, 3, 'ACCEPTED'),
-       (3, 1, 'REJECTED'),
+       (3, 1, 'CLAIMED'),
        (4, 4, 'WAITING'),
        (5, 5, 'ACCEPTED');

@@ -1,5 +1,8 @@
 package cz.asen.fridge.domain.enums;
 
 public enum ClaimState {
-    UNCLAIMED, WAITING, ACCEPTED, REJECTED, CLAIMED
+    UNCLAIMED, // Created
+    WAITING,   // Waiting for donor to accept
+    ACCEPTED,  // Waiting for claimee to arrive
+    CLAIMED    // Successfully claimed and taken
 }

@@ -43,7 +43,7 @@ create table FOOD_LISTING_CLAIM
     constraint FOOD_LISTING_CLAIM_APP_USER_USER_ID_FK
         foreign key (USER_ID) references APP_USER,
     constraint FOOD_LISTING_CLAIM_FOOD_LISTING_LISTING_ID_FK
-        foreign key (LISTING_ID) references FOOD_LISTING
+        foreign key (LISTING_ID) references FOOD_LISTING on delete cascade
 );
 
 create table FOOD_LISTING_PHOTO
@@ -54,6 +54,6 @@ create table FOOD_LISTING_PHOTO
     constraint FOOD_LISTING_PHOTO_PK
         primary key (PHOTO_ID),
     constraint FOOD_LISTING_PHOTO_FOOD_LISTING_LISTING_ID_FK
-        foreign key (LISTING_ID) references FOOD_LISTING
+        foreign key (LISTING_ID) references FOOD_LISTING on delete cascade
 );
 

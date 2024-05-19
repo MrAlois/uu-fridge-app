@@ -49,7 +49,9 @@ export default function FoodListingCreateView() {
                     <VerticalLayout theme="spacing">
                         <FormLayout responsiveSteps={responsiveSteps}>
                             <TextField label="Listing name" {...field(model.shortDescription)}/>
-                            <TextField label="Pickup location" {...field(model.pickupLocation)}/>
+                            <TextField label="Pickup location" {...field(model.pickupLocation)}>
+                                <Icon slot="prefix" icon="vaadin:map-marker" />
+                            </TextField>
                             <DatePicker label="Expiration date" {...field(model.expiryDate)}/>
                             <MultiSelectComboBox
                                 label="Allergens"
