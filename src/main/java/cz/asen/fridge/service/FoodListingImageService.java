@@ -49,7 +49,7 @@ public class FoodListingImageService {
             final var compressedBytes = ImageCompressionUtils.compressImage(base64Image, idealRatio);
             final var compressedBase64Image = Base64.getEncoder().encodeToString(compressedBytes);
 
-            log.info("Image too large [{}], compressed to [{}] with ratio of {}.", base64Image.length(), compressedBase64Image.length(), idealRatio);
+            log.warn("Image too large [{}], compressed to [{}] with ratio of {}.", base64Image.length(), compressedBase64Image.length(), idealRatio);
 
             base64Image = compressedBase64Image;
         }

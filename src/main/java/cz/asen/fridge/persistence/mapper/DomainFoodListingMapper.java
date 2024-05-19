@@ -48,7 +48,7 @@ public class DomainFoodListingMapper {
                 maybeClaimEntity
                         .map(FoodListingClaimEntity::getState)
                         .map(ClaimState::valueOf)
-                        .orElse(ClaimState.WAITING),
+                        .orElse(ClaimState.UNCLAIMED),
                 maybeClaimEntity
                         .map(FoodListingClaimEntity::getUser)
                         .map(DomainUserMapper::toDomain),

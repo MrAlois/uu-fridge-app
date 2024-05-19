@@ -52,7 +52,7 @@ public class FoodListingEndpoint {
                 request.donor(),
                 request.shortDescription(),
                 request.description(),
-                request.expiryDate() != null ? request.expiryDate() .atStartOfDay() : LocalDateTime.now(),
+                request.expiryDate().atStartOfDay(),
                 request.pickupLocation(),
                 LocalDateTime.now(), // Set created to now
                 request.allergens(),
