@@ -47,6 +47,12 @@ public class FoodListingEntity {
     @Column(name = "PICKUP_LOCATION", nullable = false, length = 128)
     private String pickupLocation;
 
+    @Column(name = "PICKUP_LAT")
+    private Double pickupLatitude;
+
+    @Column(name = "PICKUP_LNG")
+    private Double pickupLongitude;
+
     @NotNull
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "CREATED", nullable = false)

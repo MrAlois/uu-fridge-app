@@ -7,38 +7,52 @@ import {DatePicker} from "@hilla/react-components/DatePicker";
 import {TextArea} from "@hilla/react-components/TextArea";
 import {useForm} from "@hilla/react-form";
 import {readAsDataURL} from "promise-file-reader";
-import CreateListingRequestModel
-    from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/request/CreateListingRequestModel";
 import {EnumerationEndpoint, FoodListingEndpoint} from "Frontend/generated/endpoints";
-import Allergens from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Allergens";
 import {NavLink, useNavigate} from "react-router-dom";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {MultiSelectComboBox} from "@hilla/react-components/MultiSelectComboBox";
-import AllergensModel from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/AllergensModel";
+import {ComboBox} from "@hilla/react-components/ComboBox";
+import useLocationAutocomplete from "Frontend/hooks/useLocationAutocomplete";
+import CreateListingModel from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/operation/CreateListingModel";
+import Allergen from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Allergen";
+import AllergenModel from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/AllergenModel";
+import Location from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/operation/CreateListing/Location";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
 export default function FoodListingCreateView() {
     const navigate = useNavigate();
 
-    const { model, submit, value,  field } = useForm(CreateListingRequestModel, {
+    const { model, submit, value,  field } = useForm(CreateListingModel, {
         onSubmit: async (request) => {
-            await FoodListingEndpoint.createListing(request)
+            await FoodListingEndpoint.createFoodListing(request)
             navigate("/food-listings")
         }
     })
 
-    const [allergenItems, setAllergenItems] = useState<Allergens[]>(Object.values(AllergensModel));
+    const [allergenItems, setAllergenItems] = useState<Allergen[]>(Object.values(AllergenModel));
     useEffect(() => {
         EnumerationEndpoint.getAllergens().then((allergens) => setAllergenItems(allergens));
     }, []);
 
-    const responsiveSteps = [
-        { minWidth: '0', columns: 1 },
-        { minWidth: '500px', columns: 2 },
-    ];
+    const [locationQuery, setLocationQuery] = useState<string>('');
+    const locationOptions = useLocationAutocomplete(locationQuery)
+        .map((option): Location => {
+            return {
+                locationName: String(option.display_name),
+                latitude: Number(option.lat) || 0.0,
+                longitude: Number(option.lon) || 0.0
+            };
+        });
+
+    const [selectedLocation, setSelectedLocation] = useState<Location | undefined>();
+    const handleFilterChange = (e: any) => setLocationQuery(e.detail.value);
+    const handleValueChange = (e: any) => {
+        const selectedOption = locationOptions.find(option => option.locationName === e.detail.value);
+        setSelectedLocation(selectedOption);
+    };
 
     return (
         <>
@@ -48,11 +62,22 @@ export default function FoodListingCreateView() {
                         <h1 className="text-lg md:text-2xl font-semibold">Create listing</h1>
                     </div>
                     <VerticalLayout theme="spacing">
-                        <FormLayout responsiveSteps={responsiveSteps}>
+                        <FormLayout responsiveSteps={[
+                            { minWidth: '0', columns: 1 },
+                            { minWidth: '500px', columns: 2 },
+                        ]}>
                             <TextField label="Listing name" {...field(model.shortDescription)}/>
-                            <TextField label="Pickup location" {...field(model.pickupLocation)}>
+                            <ComboBox
+                                allowCustomValue
+                                label="Pickup location"
+                                onFilterChanged={handleFilterChange}
+                                onValueChanged={handleValueChange}
+                                items={locationOptions}
+                                itemLabelPath="locationName"
+                                {...field(model.pickupLocation)}
+                            >
                                 <Icon slot="prefix" icon="vaadin:map-marker" />
-                            </TextField>
+                            </ComboBox>
                             <DatePicker label="Expiration date" {...field(model.expiryDate)}/>
                             <MultiSelectComboBox
                                 label="Allergens"

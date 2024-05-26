@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import Gallery from './Gallery';
-import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
+import Gallery from '../../components/Gallery';
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
-import StateBadge from "Frontend/views/listing/StateBadge";
+import StateBadge from "Frontend/components/StateBadge";
 import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
+import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -23,7 +23,7 @@ export default function FoodListingDetailView() {
     const isCurrentUserClaiming = !isCurrentUserOwner   //TODO Auth system
 
     useEffect(() => {
-        FoodListingEndpoint.getListing(listingId as unknown as number).then((result) => setListing(result))
+        FoodListingEndpoint.getFoodListingById(listingId as unknown as number).then((result) => setListing(result))
     }, []);
 
     return (
@@ -36,7 +36,7 @@ export default function FoodListingDetailView() {
                 opened={removeDialogOpened}
                 onOpenedChanged={(event) => setRemoveDialogOpened(event.detail.value)}
                 onConfirm={() =>
-                    FoodListingEndpoint.removeListing(Number(listingId)).then(r => navigate("/food-listings"))
+                    FoodListingEndpoint.deleteFoodListing(Number(listingId)).then(r => navigate("/food-listings"))
                 }
             >
                 <p>Are you sure you want to remove this listing?</p>

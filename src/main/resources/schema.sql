@@ -6,13 +6,17 @@ drop table if exists APP_USER;
 create table APP_USER
 (
     USER_ID              INTEGER auto_increment,
-    NAME                 CHARACTER VARYING(64) not null,
+    NAME                 CHARACTER VARYING(64)                  not null,
     DEFAULT_LOCATION     CHARACTER VARYING(64),
+    DEFAULT_LAT          DOUBLE PRECISION      default 0.0,
+    DEFAULT_LNG          DOUBLE PRECISION      default 0.0,
     ALLERGIC_TO          CHARACTER VARYING(64),
-    EMAIL                CHARACTER VARYING(64) not null,
+    EMAIL                CHARACTER VARYING(64)                  not null,
     PHONE                CHARACTER VARYING(64),
     constraint USER_PK
-        primary key (USER_ID)
+        primary key (USER_ID),
+    constraint USER_UK
+        unique (EMAIL)
 );
 
 create table FOOD_LISTING
@@ -23,6 +27,8 @@ create table FOOD_LISTING
     DESCRIPTION       CHARACTER VARYING(512)                          not null,
     EXPIRY_DATE       TIMESTAMP                                       not null,
     PICKUP_LOCATION   CHARACTER VARYING(128)                          not null,
+    PICKUP_LAT        DOUBLE PRECISION      default 0.0               not null,
+    PICKUP_LNG        DOUBLE PRECISION      default 0.0               not null,
     CREATED           TIMESTAMP             default CURRENT_TIMESTAMP not null,
     ALLERGENS         CHARACTER VARYING(64),
     constraint FOOD_LISTING_PK

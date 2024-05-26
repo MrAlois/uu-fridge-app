@@ -42,6 +42,8 @@ public class DomainFoodListingMapper {
                 entity.getDescription(),
                 LocalDateTime.ofInstant(entity.getExpiryDate(), ZoneId.systemDefault()),
                 entity.getPickupLocation(),
+                entity.getPickupLatitude(),
+                entity.getPickupLongitude(),
                 LocalDateTime.ofInstant(entity.getCreated(), ZoneId.systemDefault()),
                 DomainAllergenMapper.parseAllergens(entity.getAllergens()),
                 maybeClaimEntity
@@ -70,6 +72,8 @@ public class DomainFoodListingMapper {
         entity.setDescription(domain.description());
         entity.setExpiryDate(domain.expiryDate().toInstant(ZoneOffset.UTC));
         entity.setPickupLocation(domain.pickupLocation());
+        entity.setPickupLatitude(domain.pickupLatitude());
+        entity.setPickupLongitude(domain.pickupLongitude());
         entity.setCreated(domain.created().toInstant(ZoneOffset.UTC));
         entity.setAllergens(DomainAllergenMapper.parseAllergens(domain.allergens()));
 

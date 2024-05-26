@@ -1,7 +1,7 @@
 package cz.asen.unicorn.fridge.endpoint;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import cz.asen.unicorn.fridge.domain.enums.Allergens;
+import cz.asen.unicorn.fridge.domain.enums.Allergen;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @AnonymousAllowed
 public class EnumerationEndpoint {
     @Nonnull
-    public Set<@Nonnull Allergens> getAllergens(){
-        return Arrays.stream(Allergens.values())
+    public Set<@Nonnull Allergen> getAllergens(){
+        return Arrays.stream(Allergen.values())
                 .collect(Collectors.toSet());
     }
 

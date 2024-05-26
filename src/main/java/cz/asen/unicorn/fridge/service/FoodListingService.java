@@ -1,6 +1,10 @@
 package cz.asen.unicorn.fridge.service;
 
 import cz.asen.unicorn.fridge.domain.FoodListing;
+import cz.asen.unicorn.fridge.domain.User;
+import cz.asen.unicorn.fridge.domain.enums.Allergen;
+import cz.asen.unicorn.fridge.domain.enums.ClaimState;
+import cz.asen.unicorn.fridge.domain.enums.DistanceType;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingEntity;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingPhotoEntity;
 import cz.asen.unicorn.fridge.persistence.mapper.DomainFoodListingMapper;
@@ -8,13 +12,19 @@ import cz.asen.unicorn.fridge.persistence.mapper.DomainFoodListingPhotoMapper;
 import cz.asen.unicorn.fridge.persistence.repository.FoodListingClaimRepository;
 import cz.asen.unicorn.fridge.persistence.repository.FoodListingPhotoRepository;
 import cz.asen.unicorn.fridge.persistence.repository.FoodListingRepository;
+import cz.asen.unicorn.fridge.persistence.specification.FoodListingSpecification;
+import cz.asen.unicorn.fridge.utils.GeoUtils;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class FoodListingService {
@@ -28,7 +38,7 @@ public class FoodListingService {
         this.foodListingPhotoRepository = foodListingPhotoRepository;
     }
 
-    public FoodListing getListingById(int listingId) throws NoSuchElementException{
+    public FoodListing getListingByIdOrThrow(int listingId) throws NoSuchElementException {
         return foodListingRepository.findById(listingId)
                 .map(this::findAndFillListingMetadata)
                 .orElseThrow(() -> new NoSuchElementException("Listing of id " + listingId + " not found"));
@@ -42,6 +52,30 @@ public class FoodListingService {
 
     public List<FoodListing> searchForListings(String query){
         return foodListingRepository.findByShortDescriptionContainsIgnoreCaseOrPickupLocationContainsIgnoreCase(query, query).stream()
+                .map(this::findAndFillListingMetadata)
+                .toList();
+    }
+
+    public List<FoodListing> searchListings(
+            @Nullable String name,
+            @Nullable ClaimState state,
+            @Nullable User owner,
+            @Nullable LocalDate upToExpiryDate,
+            @Nullable Set<Allergen> allergens,
+            @Nullable DistanceType distanceType
+    ) {
+        final var allListings = foodListingRepository.findAll(
+                Specification.where(
+                        FoodListingSpecification.nameContains(name)
+                                .and(FoodListingSpecification.hasAllergens(allergens))
+                                .and(FoodListingSpecification.upToExpiryDate(upToExpiryDate))
+                                .and(FoodListingSpecification.hasState(state))
+                                .and(FoodListingSpecification.ownedBy(owner))
+                )
+        );
+
+        return allListings.stream()
+                .filter(listing -> distanceType == null || GeoUtils.withinRadius(listing.getPickupLatitude(), listing.getPickupLongitude(), listing.getPickupLatitude(), listing.getPickupLongitude(), distanceType.getValueInMeter()))
                 .map(this::findAndFillListingMetadata)
                 .toList();
     }
@@ -70,7 +104,7 @@ public class FoodListingService {
     }
 
     /**
-     * Finds and fills the metadata for a FoodListing based on the given FoodListingEntity
+     * Finds and fills the metadata (images and claims) for a FoodListing based on the given FoodListingEntity
      *
      * @param foodListing The FoodListingEntity to find and fill the metadata for
      * @return The filled FoodListing object with metadata

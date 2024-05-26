@@ -24,6 +24,7 @@
     "@vaadin/bundles": "24.3.0",
     "@vaadin/common-frontend": "0.0.19",
     "@vaadin/router": "1.7.5",
+    "axios": "^1.7.2",
     "classnames": "^2.3.2",
     "construct-style-sheets-polyfill": "3.1.0",
     "lit": "3.1.0",
@@ -84,7 +85,8 @@
     "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli",
     "@react-buddy/ide-toolbox": "$@react-buddy/ide-toolbox",
     "@tailwindcss/aspect-ratio": "$@tailwindcss/aspect-ratio",
-    "promise-file-reader": "$promise-file-reader"
+    "promise-file-reader": "$promise-file-reader",
+    "axios": "$axios"
   },
   "vaadin": {
     "dependencies": {
@@ -128,6 +130,6 @@
       "workbox-core": "7.0.0",
       "workbox-precaching": "7.0.0"
     },
-    "hash": "635cd1adb37173d703484b6ef99b41738376bb9de9f4a828d7fbcf524d16f8e7"
+    "hash": "b4346e0460bab7545e6062b4235f979d3edb8cf44583951450ba4f33790ef8e1"
   }
 }

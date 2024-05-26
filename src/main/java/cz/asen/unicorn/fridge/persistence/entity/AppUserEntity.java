@@ -27,6 +27,12 @@ public class AppUserEntity {
     @Column(name = "DEFAULT_LOCATION", length = 64)
     private String defaultLocation;
 
+    @Column(name = "DEFAULT_LAT")
+    private Double defaultLatitude;
+
+    @Column(name = "DEFAULT_LNG")
+    private Double defaultLongitude;
+
     @Size(max = 64)
     @Column(name = "ALLERGIC_TO", length = 128)
     private String allergicTo;

@@ -1,6 +1,6 @@
 package cz.asen.unicorn.fridge.domain;
 
-import cz.asen.unicorn.fridge.domain.enums.Allergens;
+import cz.asen.unicorn.fridge.domain.enums.Allergen;
 import cz.asen.unicorn.fridge.persistence.entity.AppUserEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +22,7 @@ public record User(
         @Size(max = 64)
         String defaultLocation,
 
-        Set<Allergens> allergens,
+        Set<Allergen> allergens,
 
         @NotNull
         @Size(max = 64)

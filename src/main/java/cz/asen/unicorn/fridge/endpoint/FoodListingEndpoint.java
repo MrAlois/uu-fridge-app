@@ -3,17 +3,19 @@ package cz.asen.unicorn.fridge.endpoint;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import cz.asen.unicorn.fridge.domain.FoodListing;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
-import cz.asen.unicorn.fridge.domain.enums.Distance;
-import cz.asen.unicorn.fridge.endpoint.request.CreateListingRequest;
+import cz.asen.unicorn.fridge.domain.enums.DistanceType;
+import cz.asen.unicorn.fridge.endpoint.operation.CreateListing;
+import cz.asen.unicorn.fridge.endpoint.view.FoodListingSummary;
 import cz.asen.unicorn.fridge.service.FoodListingService;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.Nullable;
-import lombok.val;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Endpoint
@@ -25,35 +27,55 @@ public class FoodListingEndpoint {
         this.foodListingService = foodListingService;
     }
 
+    @Deprecated
     @Nonnull
-    public List<FoodListing> getAllListings(){
-        return foodListingService.getAllFoodListings();
+    public List<FoodListingSummary> getAllFoodListingSummaries(){
+        return foodListingService.getAllFoodListings().stream()
+                .map(FoodListingEndpoint::transformToFoodListingSummaryView)
+                .toList();
     }
 
     @Nonnull
-    public FoodListing getListing(int listingId) {
-        return foodListingService.getListingById(listingId);
+    public List<FoodListingSummary> searchFoodListings(@Nonnull String name, @Nullable DistanceType distanceType){
+        return foodListingService.searchForListings(name).stream()
+                .map(FoodListingEndpoint::transformToFoodListingSummaryView)
+                .toList();
     }
 
     @Nonnull
-    public List<FoodListing> searchListings(@Nonnull String name, @Nullable Distance distance){
-        return foodListingService.searchForListings(name);
+    public FoodListing getFoodListingById(int listingId) throws NoSuchElementException {
+        return foodListingService.getListingByIdOrThrow(listingId);
     }
 
     @Nonnull
-    public FoodListing createListing(@Nonnull @NotNull CreateListingRequest request){
-        return updateListing(request, null);
+    public FoodListing createFoodListing(@Nonnull @NotNull CreateListing request){
+        return foodListingService.saveListing(
+                buildFromCreateRequest(request, null)
+        );
     }
 
     @Nonnull
-    public FoodListing updateListing(@Nonnull @NotNull CreateListingRequest request, Integer listingId){
-        val foodListing = new FoodListing(
+    public FoodListing updateFoodListing(@Nonnull @NotNull CreateListing request, Integer listingId){
+        return foodListingService.saveListing(
+                buildFromCreateRequest(request, listingId)
+        );
+    }
+
+    public void deleteFoodListing(@Nonnull @NotNull Integer listingId) throws NoSuchElementException {
+        foodListingService.deleteListingById(listingId);
+    }
+
+    @Contract("_, _ -> new")
+    private static @NotNull FoodListing buildFromCreateRequest(@NotNull CreateListing request, Integer listingId){
+        return new FoodListing(
                 listingId,
                 request.donor(),
                 request.shortDescription(),
                 request.description(),
                 request.expiryDate().atStartOfDay(),
-                request.pickupLocation(),
+                request.pickupLocation().locationName(),
+                request.pickupLocation().latitude(),
+                request.pickupLocation().longitude(),
                 LocalDateTime.now(), // Set created to now
                 request.allergens(),
                 ClaimState.UNCLAIMED,
@@ -61,11 +83,18 @@ public class FoodListingEndpoint {
                 Optional.empty(),
                 request.base64Images()
         );
-
-        return foodListingService.saveListing(foodListing);
     }
 
-    public void removeListing(@Nonnull @NotNull Integer listingId){
-        foodListingService.deleteListingById(listingId);
+    private static @NotNull FoodListingSummary transformToFoodListingSummaryView(@NotNull FoodListing foodListing) {
+        return new FoodListingSummary(
+                foodListing.id(),
+                foodListing.shortDescription(),
+                foodListing.expiryDate(),
+                foodListing.pickupLocation(),
+                foodListing.created(),
+                foodListing.donor().name(),
+                foodListing.currentState(),
+                foodListing.base64Images()
+        );
     }
 }

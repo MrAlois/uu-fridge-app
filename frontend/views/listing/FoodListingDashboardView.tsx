@@ -1,35 +1,36 @@
 import React, {useEffect, useState} from "react";
-import Gallery from "Frontend/views/listing/Gallery";
+import Gallery from "Frontend/components/Gallery";
 import {NavLink} from "react-router-dom";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
-import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {TextField} from "@hilla/react-components/TextField";
 import {Select} from "@hilla/react-components/Select";
 import {truncateText} from "Frontend/util/text-utils";
-import Distance from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Distance";
-import StateBadge from "Frontend/views/listing/StateBadge";
+import StateBadge from "Frontend/components/StateBadge";
+import DistanceType from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/DistanceType";
+import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
+import FoodListingSummary from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/view/FoodListingSummary";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
-export default function FoodListingView() {
-    const [serverListings, setServerListings] = useState<FoodListing[]>([])
+export default function FoodListingDashboardView() {
+    const [serverListings, setServerListings] = useState<FoodListingSummary[]>([])
     const [searchQuery, setSearchQuery] = useState<string>()
-    const [kmFilter, setKmFilter] = useState(Distance.ALL);
+    const [kmFilter, setKmFilter] = useState(DistanceType.ALL);
 
     useEffect(() => {
         if (searchQuery) {
-            FoodListingEndpoint.searchListings(searchQuery, kmFilter).then((result) => {
-                let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
-                setServerListings(listings as FoodListing[])
+            FoodListingEndpoint.searchFoodListings(searchQuery, kmFilter).then((result) => {
+                let listings = result == undefined ? [] as FoodListingSummary[] : result?.filter(it => it != null)
+                setServerListings(listings as FoodListingSummary[])
             })
         }
         else {
-            FoodListingEndpoint.getAllListings().then((result) => {
+            FoodListingEndpoint.getAllFoodListingSummaries().then((result) => {
                 let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
-                setServerListings(listings as FoodListing[])
+                setServerListings(listings as FoodListingSummary[])
             })
         }
     }, [searchQuery]);
@@ -61,13 +62,13 @@ export default function FoodListingView() {
                         className="w-full sm:w-1/3 p-2 my-2 sm:my-0"
                         value={kmFilter.toString()}
                         items={areaFilterItems}
-                        onChange={e => setKmFilter(Distance[e.target.value as keyof typeof Distance])}
+                        onChange={e => setKmFilter(DistanceType[e.target.value as keyof typeof DistanceType])}
                     />
                 </div>
 
                 {/* Listing content section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto">
-                    {serverListings.map((listing: FoodListing) => (
+                    {serverListings.map((listing: FoodListingSummary) => (
                         <div key={listing.id}
                              className="flex flex-col border overflow-hidden rounded-md items-stretch w-full max-w-xs p-4 mx-auto">
                             <div className="flex justify-between mb-4">
@@ -80,7 +81,7 @@ export default function FoodListingView() {
                             <Gallery images={listing?.base64Images}/>
 
                             <div className="text-sm">
-                                <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donor?.name}</p>
+                                <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donorName}</p>
                                 <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate as string).toDateString()}</p>
                                 <p className="mb-2"><strong>Address:</strong> {listing.pickupLocation}</p>
                                 <p className="mb-2"><strong>State:</strong> <StateBadge state={listing.currentState}/></p>
