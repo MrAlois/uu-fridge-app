@@ -1,6 +1,6 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Gallery from './Gallery';
-import FoodListing from "Frontend/generated/cz/asen/fridge/domain/FoodListing";
+import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
 import {Tabs} from "@hilla/react-components/Tabs";
@@ -8,7 +8,7 @@ import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
 import StateBadge from "Frontend/views/listing/StateBadge";
-import ClaimState from "Frontend/generated/cz/asen/fridge/domain/enums/ClaimState";
+import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -64,7 +64,7 @@ export default function FoodListingDetailView() {
                 <Gallery images={listing?.base64Images}/>
 
                 <section className="my-10">
-                    <span className="text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5x">Listing information</span>
+                    <span className="text-2xl leading-none tracking-tight text-gray-900 md:text-5x">Listing information</span>
                     <table className="table-fixed w-full h-full mt-5">
                         <tbody>
 
@@ -116,7 +116,7 @@ export default function FoodListingDetailView() {
                 </section>
                 {listing?.currentClaimingUser && (
                     <section className="my-10">
-                        <span className="text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5x">Claimant information</span>
+                        <span className="text-2xl leading-none tracking-tight text-gray-900 md:text-5x">Claimant information</span>
                         <table className="table-fixed w-full h-full mt-5">
                             <tbody>
                             <tr className="border-b">

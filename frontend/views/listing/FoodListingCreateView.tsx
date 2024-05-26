@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FormLayout} from "@hilla/react-components/FormLayout";
 import {TextField} from "@hilla/react-components/TextField";
 import {VerticalLayout} from "@hilla/react-components/VerticalLayout";
@@ -6,16 +6,17 @@ import {Upload} from "@hilla/react-components/Upload";
 import {DatePicker} from "@hilla/react-components/DatePicker";
 import {TextArea} from "@hilla/react-components/TextArea";
 import {useForm} from "@hilla/react-form";
-import { readAsDataURL } from "promise-file-reader";
-import CreateListingRequestModel from "Frontend/generated/cz/asen/fridge/endpoint/request/CreateListingRequestModel";
+import {readAsDataURL} from "promise-file-reader";
+import CreateListingRequestModel
+    from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/request/CreateListingRequestModel";
 import {EnumerationEndpoint, FoodListingEndpoint} from "Frontend/generated/endpoints";
-import Allergens from "Frontend/generated/cz/asen/fridge/domain/enums/Allergens";
+import Allergens from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Allergens";
 import {NavLink, useNavigate} from "react-router-dom";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {MultiSelectComboBox} from "@hilla/react-components/MultiSelectComboBox";
-import AllergensModel from "Frontend/generated/cz/asen/fridge/domain/enums/AllergensModel";
+import AllergensModel from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/AllergensModel";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 

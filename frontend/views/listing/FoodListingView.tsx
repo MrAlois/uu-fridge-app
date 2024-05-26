@@ -1,15 +1,15 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Gallery from "Frontend/views/listing/Gallery";
 import {NavLink} from "react-router-dom";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
-import FoodListing from "Frontend/generated/cz/asen/fridge/domain/FoodListing";
+import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import {Tab} from "@hilla/react-components/Tab";
 import {Icon} from "@hilla/react-components/Icon";
 import {Tabs} from "@hilla/react-components/Tabs";
 import {TextField} from "@hilla/react-components/TextField";
 import {Select} from "@hilla/react-components/Select";
 import {truncateText} from "Frontend/util/text-utils";
-import Distance from "Frontend/generated/cz/asen/fridge/domain/enums/Distance";
+import Distance from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Distance";
 import StateBadge from "Frontend/views/listing/StateBadge";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"

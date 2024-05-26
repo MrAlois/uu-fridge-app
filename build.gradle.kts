@@ -6,8 +6,8 @@ plugins {
 	id("dev.hilla") version "2.5.5"
 }
 
-group = "cz.asen.fridge"
-version = "0.0.1-SNAPSHOT"
+group = "cz.asen.unicorn.fridge"
+version = "1.0.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -38,6 +38,7 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.h2database:h2")
+
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import ClaimState from "Frontend/generated/cz/asen/fridge/domain/enums/ClaimState";
+import React from "react";
+import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
 import {Icon} from "@hilla/react-components/Icon";
 
 interface StateBadgeProps{
