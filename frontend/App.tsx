@@ -1,7 +1,12 @@
-import { router } from "Frontend/routes.js";
+import {router} from "Frontend/routes.js";
 import "./main.css"
-import { RouterProvider } from "react-router-dom";
+import {RouterProvider} from "react-router-dom";
+import {UserProvider} from "Frontend/components/UserProvider";
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return(
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
+  );
 }

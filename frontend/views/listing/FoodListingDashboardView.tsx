@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Gallery from "Frontend/components/Gallery";
 import {NavLink} from "react-router-dom";
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
@@ -12,6 +12,8 @@ import StateBadge from "Frontend/components/StateBadge";
 import DistanceType from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/DistanceType";
 import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import FoodListingSummary from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/view/FoodListingSummary";
+import {Tooltip} from "@hilla/react-components/Tooltip";
+import {UserContext} from "Frontend/components/UserProvider";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -19,6 +21,8 @@ export default function FoodListingDashboardView() {
     const [serverListings, setServerListings] = useState<FoodListingSummary[]>([])
     const [searchQuery, setSearchQuery] = useState<string>()
     const [kmFilter, setKmFilter] = useState(DistanceType.ALL);
+
+    const { currentUser } = useContext(UserContext)
 
     useEffect(() => {
         if (searchQuery) {
@@ -33,7 +37,7 @@ export default function FoodListingDashboardView() {
                 setServerListings(listings as FoodListingSummary[])
             })
         }
-    }, [searchQuery]);
+    }, [searchQuery, currentUser]);
 
     const areaFilterItems = [
         { label: 'All', value: 'ALL' },
@@ -75,14 +79,14 @@ export default function FoodListingDashboardView() {
                                 <NavLink to={`/food-listings/${listing.id}`}>
                                     <h4 className="font-semibold">{truncateText(listing.shortDescription, 20)}</h4>
                                 </NavLink>
-                                <p className="text-sm text-gray-500">{new Date(listing?.created as string).toDateString()}</p>
+                                <p className="text-sm text-gray-500">{new Date(listing?.created).toDateString()}</p>
                             </div>
 
                             <Gallery images={listing?.base64Images}/>
 
                             <div className="text-sm">
-                                <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donorName}</p>
-                                <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate as string).toDateString()}</p>
+                                <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donorName} {listing?.donorId === currentUser.id ? <span {...{ theme: 'badge success' }}>You</span> : ""}</p>
+                                <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate).toDateString()}</p>
                                 <p className="mb-2"><strong>Address:</strong> {listing.pickupLocation}</p>
                                 <p className="mb-2"><strong>State:</strong> <StateBadge state={listing.currentState}/></p>
                             </div>
@@ -97,6 +101,7 @@ export default function FoodListingDashboardView() {
                         <Icon icon="vaadin:plus-circle" className={iconStyle}/>
                     </NavLink>
                 </Tab>
+                <Tooltip slot="tooltip" text="Create listing" position="top" />
             </Tabs>
         </>
     );

@@ -20,7 +20,7 @@ public class DomainUserMapper {
         );
     }
 
-    static @NotNull AppUserEntity fromDomain(@NotNull User user) {
+    public static @NotNull AppUserEntity fromDomain(@NotNull User user) {
         final AppUserEntity appUserEntity = new AppUserEntity();
 
         appUserEntity.setId(user.id());

@@ -27,7 +27,6 @@ public class FoodListingEndpoint {
         this.foodListingService = foodListingService;
     }
 
-    @Deprecated
     @Nonnull
     public List<FoodListingSummary> getAllFoodListingSummaries(){
         return foodListingService.getAllFoodListings().stream()
@@ -93,6 +92,7 @@ public class FoodListingEndpoint {
                 foodListing.pickupLocation(),
                 foodListing.created(),
                 foodListing.donor().name(),
+                foodListing.donor().id(),
                 foodListing.currentState(),
                 foodListing.base64Images()
         );

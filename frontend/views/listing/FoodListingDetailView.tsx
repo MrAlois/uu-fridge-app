@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Gallery from '../../components/Gallery';
 import {FoodListingEndpoint} from "Frontend/generated/endpoints";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
@@ -9,6 +9,8 @@ import {ConfirmDialog} from "@hilla/react-components/ConfirmDialog";
 import StateBadge from "Frontend/components/StateBadge";
 import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
 import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
+import {Tooltip} from "@hilla/react-components/Tooltip";
+import {UserContext} from "Frontend/components/UserProvider";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -19,8 +21,9 @@ export default function FoodListingDetailView() {
     const [unclaimDialogOpened, setUnclaimDialogOpened] = useState(false);
     const [listing, setListing] = useState<FoodListing>()
 
-    const isCurrentUserOwner = false                     //TODO Auth system
-    const isCurrentUserClaiming = !isCurrentUserOwner   //TODO Auth system
+    const { currentUser } = useContext(UserContext);
+    const isCurrentUserOwner = currentUser?.email === listing?.donor?.email;
+    const isCurrentUserClaiming = currentUser?.id === listing?.currentClaimingUser?.id;
 
     useEffect(() => {
         FoodListingEndpoint.getFoodListingById(listingId as unknown as number).then((result) => setListing(result))
@@ -64,80 +67,68 @@ export default function FoodListingDetailView() {
                 <Gallery images={listing?.base64Images}/>
 
                 <section className="my-10">
-                    <span className="text-2xl leading-none tracking-tight text-gray-900 md:text-5x">Listing information</span>
-                    <table className="table-fixed w-full h-full mt-5">
-                        <tbody>
+                    <div className="text-2xm leading-none tracking-tight text-gray-900 md:text-3xl">
+                        Listing Information
+                    </div>
+                    <div className="grid grid-cols-4 w-full h-full mt-5">
+                        <div className="border-b py-2 col-span-1 font-bold">Listing state:</div>
+                        <div className="border-b py-2 col-span-3 flex items-center">
+                            <StateBadge state={listing?.currentState}/>
+                            {isCurrentUserOwner && (
+                                <span className="mx-4 bg-green-500 text-white rounded-full py-1 px-3 ml-4">This is your listing!</span>
+                            )}
+                        </div>
 
-                        <tr className="border-b">
-                            <td className="w-1/4 py-2"><strong>Listing state:</strong></td>
-                            <td className="w-3/4 py-2">
-                                <StateBadge state={listing?.currentState}/>
-                                {isCurrentUserOwner && (
-                                    <span className="mx-4" {...{theme: 'badge success'}}>This is your listing!</span>
-                                )}
-                            </td>
-                        </tr>
+                        <div className="border-b py-2 col-span-1 font-bold">Donor Name:</div>
+                        <div className="border-b py-2 col-span-3">{listing?.donor?.name}</div>
 
-                        <tr className="border-b">
-                            <td className="w-1/4 py-2"><strong>Donor Name:</strong></td>
-                            <td className="w-3/4 py-2">{listing?.donor?.name}</td>
-                        </tr>
+                        <div className="border-b py-2 col-span-1 font-bold">Donor Contacts:</div>
+                        <div className="border-b py-2 col-span-3 flex flex-col">
+                            <a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a>
+                            <p>{listing?.donor?.phone}</p>
+                        </div>
 
-                        <tr className="border-b">
-                            <td className="w-1/4 py-2"><strong>Donor Contacts:</strong></td>
-                            <td className="w-3/4 py-2">
-                                <p><a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
-                                <p>{listing?.donor?.phone}</p>
-                            </td>
-                        </tr>
-
-                        <tr className="border-b">
-                            <td className="w-1/4 py-2"><strong>Pickup Location:</strong></td>
-                            <td className="w-3/4 py-2">
-                                <p>{listing?.pickupLocation}</p>
-                            </td>
-                        </tr>
+                        <div className="border-b py-2 col-span-1 font-bold">Pickup Location:</div>
+                        <div className="border-b py-2 col-span-3">
+                            <p>{listing?.pickupLocation}</p>
+                        </div>
 
                         {listing?.allergens?.length !== 0 && (
-                            <tr className="border-b">
-                                <td className="w-1/4 py-2"><strong>Dietary Properties:</strong></td>
-                                <td className="w-3/4 py-2"> {listing?.allergens?.join(", ")}</td>
-                            </tr>
+                            <>
+                                <div className="border-b py-2 col-span-1 font-bold">Dietary Properties:</div>
+                                <div className="border-b py-2 col-span-3">{listing?.allergens?.join(", ")}</div>
+                            </>
                         )}
 
-                        <tr className="border-b">
-                            <td className="w-1/4 py-2"><strong>Description:</strong></td>
-                            <td className="w-3/4 py-2">
-                                <p>{listing?.description}</p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                        <div className="border-b py-2 col-span-1 font-bold">Description:</div>
+                        <div className="border-b py-2 col-span-3">
+                            <p>{listing?.description}</p>
+                        </div>
+                    </div>
                 </section>
                 {listing?.currentClaimingUser && (
                     <section className="my-10">
                         <span className="text-2xl leading-none tracking-tight text-gray-900 md:text-5x">Claimant information</span>
-                        <table className="table-fixed w-full h-full mt-5">
-                            <tbody>
-                            <tr className="border-b">
-                                <td className="w-1/4 py-2"><strong>Name:</strong></td>
-                                <td className="w-3/4 py-2">{listing.currentClaimingUser.name}</td>
-                            </tr>
 
-                            <tr className="border-b">
-                                <td className="w-1/4 py-2"><strong>Contact:</strong></td>
-                                <td className="w-3/4 py-2">
+                        <div className="mt-5 space-y-4">
+                            <div className="grid grid-cols-4 py-2 border-b">
+                                <strong className="col-span-1">Name:</strong>
+                                <div className="col-span-3 w-full">{listing.currentClaimingUser.name}</div>
+                            </div>
+
+                            <div className="grid grid-cols-4 py-2 border-b">
+                                <strong className="col-span-1">Contact:</strong>
+                                <div className="col-span-3 w-full">
                                     <p><a href={`mailto:${listing.currentClaimingUser.email}`}>{listing.currentClaimingUser.email}</a></p>
                                     <p>{listing.currentClaimingUser.phone}</p>
-                                </td>
-                            </tr>
+                                </div>
+                            </div>
 
-                            <tr className="border-b">
-                                <td className="w-1/4 py-2"><strong>Claimed At:</strong></td>
-                                <td className="w-3/4 py-2">{new Date(listing.claimTime as string).toUTCString()}</td>
-                            </tr>
-                            </tbody>
-                        </table>
+                            <div className="grid grid-cols-4 py-2 border-b">
+                                <strong className="col-span-1">Claimed At:</strong>
+                                <div className="col-span-3 w-full">{new Date(listing.claimTime as string).toUTCString()}</div>
+                            </div>
+                        </div>
                     </section>
                 )}
             </div>
@@ -148,6 +139,7 @@ export default function FoodListingDetailView() {
                     <NavLink to="/food-listings" tabIndex={-1}>
                     <Icon icon="vaadin:arrow-circle-left" className={iconStyle}/>
                     </NavLink>
+                    <Tooltip slot="tooltip" text="Back" position="top" />
                 </Tab>
 
                 {listing?.currentState == ClaimState.UNCLAIMED && !isCurrentUserOwner && (
@@ -155,6 +147,7 @@ export default function FoodListingDetailView() {
                         <NavLink to="#" onClick={() => alert("Order claimed")} tabIndex={-1}>
                             <Icon icon="vaadin:location-arrow-circle" className={iconStyle}/>
                         </NavLink>
+                        <Tooltip slot="tooltip" text="Claim" position="top" />
                     </Tab>
                 )}
 
@@ -163,6 +156,7 @@ export default function FoodListingDetailView() {
                         <NavLink to="#" onClick={() => alert("Editing listing")} tabIndex={-1}>
                             <Icon icon="vaadin:ellipsis-circle" className={iconStyle}/>
                         </NavLink>
+                        <Tooltip slot="tooltip" text="Edit" position="top" />
                     </Tab>
                 )}
 
@@ -171,6 +165,7 @@ export default function FoodListingDetailView() {
                         <NavLink to="#" onClick={() => setRemoveDialogOpened(true)} tabIndex={-1}>
                             <Icon icon="vaadin:close-circle" className={iconStyle}/>
                         </NavLink>
+                        <Tooltip slot="tooltip" text="Cancel" position="top" />
                     </Tab>
                 )}
 
@@ -179,6 +174,7 @@ export default function FoodListingDetailView() {
                         <NavLink to="#" onClick={() => setUnclaimDialogOpened(true)} tabIndex={-1}>
                             <Icon icon="vaadin:close-circle" className={iconStyle}/>
                         </NavLink>
+                        <Tooltip slot="tooltip" text="Remove Claim" position="top" />
                     </Tab>
                 )}
             </Tabs>

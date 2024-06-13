@@ -13,7 +13,7 @@ interface StateMapping {
     text: string
 }
 
-export default function StateBadge({state}: StateBadgeProps){
+export default function StateBadge({state}: Readonly<StateBadgeProps>){
     const mapping: StateMapping[] = [
         {state: ClaimState.UNCLAIMED,   theme: 'badge contrast', icon: 'vaadin:ellipsis-dots-h',  text: 'Unclaimed'},
         {state: ClaimState.WAITING,     theme: 'badge',         icon: 'vaadin:clock',           text: 'Waiting for answer'},

@@ -14,6 +14,7 @@ public record FoodListingSummary(
         @Nonnull String pickupLocation,
         @Nonnull LocalDateTime created,
         @Nonnull String donorName,
+        @Nonnull Integer donorId,
         @Nonnull ClaimState currentState,
         @Nonnull Set<String> base64Images
 ) implements Serializable {

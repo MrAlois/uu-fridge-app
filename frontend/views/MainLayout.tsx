@@ -1,9 +1,11 @@
-import { AppLayout, type AppLayoutElement } from '@hilla/react-components/AppLayout.js';
-import React, {useEffect, useRef} from 'react';
+import {AppLayout, type AppLayoutElement} from '@hilla/react-components/AppLayout.js';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {Outlet} from "react-router-dom";
 import {MenuBar} from "@hilla/react-components/MenuBar";
 import {createRoot} from "react-dom/client";
 import {Icon} from "@hilla/react-components/Icon";
+import {MenuBarItem} from "@vaadin/menu-bar/src/vaadin-menu-bar-mixin";
+import {UserContext} from "Frontend/components/UserProvider";
 
 function menuComponent(component: React.ReactNode) {
     const container = document.createElement('vaadin-menu-bar-item');
@@ -11,7 +13,7 @@ function menuComponent(component: React.ReactNode) {
     return container;
 }
 
-function createMenuItem(iconName: string, text: string, isChild = false) {
+function createMenuItem(iconName: string, text: (string | undefined), isChild = false) {
     const iconStyle: React.CSSProperties = {};
     if (isChild) {
         iconStyle.width = 'var(--lumo-icon-size-s)';
@@ -34,7 +36,6 @@ function createMenuItem(iconName: string, text: string, isChild = false) {
 
 export default function MainLayout() {
     const appLayoutRef = useRef<AppLayoutElement>(null);
-
     useEffect(() => {
         const appLayout = appLayoutRef.current;
         if (appLayout) {
@@ -44,29 +45,43 @@ export default function MainLayout() {
         }
     }, []);
 
-    const menuItems = [
-        {
-            component: createMenuItem('menu', ''),
-            children: [
-                { component: createMenuItem('user', 'Account', true) },
-                { component: createMenuItem('notebook', 'My Claims', true) },
-                { component: 'hr' },
-                { component: createMenuItem('sign-out', 'Logout', true) },
-            ],
-        }
-    ];
+    // DEV code to simulate authenticaiton
+    const { currentUser, appUsers, selectUserByEmail } = useContext(UserContext)
+    const [menuItems, setMenuItems] = useState<MenuBarItem[]>([]);
+    useEffect(() => {
+        const parsedUsers: MenuBarItem[] = appUsers.map(user => ({ text: user.email }));
+
+        const newMenuItems = [
+            {
+                component: createMenuItem('menu', ''),
+                children: [
+                    { component: createMenuItem('user', currentUser.name, true) },
+                    { component: 'hr' },
+                    { component: createMenuItem('sign-out', 'Logout', true) },
+                    {
+                        component: createMenuItem('cheat', '[DEV] Select account', true),
+                        children: parsedUsers
+                    },
+                ],
+            }
+        ];
+        setMenuItems(newMenuItems);
+    }, [appUsers, currentUser]);
 
     return (
         <AppLayout ref={appLayoutRef}>
             <header slot="navbar" className="bg-gray-800 p-4 text-white w-full">
                 <div className="flex items-center justify-between">
-                    <MenuBar items={menuItems} onItemSelected={(event) => alert(JSON.stringify(event.detail.value))}/> Food Rescue Fridge App
+                    <MenuBar items={menuItems} onItemSelected={
+                        (event) => {
+                            selectUserByEmail(event.detail.value.text ?? "");
+                        }
+                    }/>
+                    Food Rescue Fridge App
                 </div>
             </header>
 
             <Outlet/>
-
-            {/* TODO Ideally put action bar here if possible */}
         </AppLayout>
     );
 };
