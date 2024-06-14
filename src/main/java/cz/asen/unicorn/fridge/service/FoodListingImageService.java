@@ -31,7 +31,7 @@ public class FoodListingImageService {
      */
     public void saveAllBase64lImages(Integer listingId, @NotNull List<String> base64Images){
         final var foodListing = new FoodListingEntity();
-        foodListing.setId(listingId);
+        foodListing.setListingId(listingId);
 
         final var imageEntities = base64Images.stream()
                 .map(imageBase64 -> saveImage(foodListing, imageBase64))

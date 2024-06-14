@@ -15,10 +15,9 @@ interface StateMapping {
 
 export default function StateBadge({state}: Readonly<StateBadgeProps>){
     const mapping: StateMapping[] = [
-        {state: ClaimState.UNCLAIMED,   theme: 'badge contrast', icon: 'vaadin:ellipsis-dots-h',  text: 'Unclaimed'},
-        {state: ClaimState.WAITING,     theme: 'badge',         icon: 'vaadin:clock',           text: 'Waiting for answer'},
-        {state: ClaimState.ACCEPTED,    theme: 'badge success', icon: 'vaadin:time-forward',    text: 'Accepted'},
-        {state: ClaimState.CLAIMED,     theme: 'badge success', icon: 'vaadin:check',           text: 'Claimed!'},
+        {state: ClaimState.UNCLAIMED,    theme: 'badge contrast', icon: 'vaadin:ellipsis-dots-h',  text: 'Unclaimed'},
+        {state: ClaimState.CLAIMED,      theme: 'badge',          icon: 'vaadin:clock',            text: 'Claimed'},
+        {state: ClaimState.FINISHED,     theme: 'badge success',  icon: 'vaadin:check',            text: 'Finished'},
     ]
 
     const currentState = mapping.find(map => map.state === state) || mapping[0];

@@ -21,6 +21,7 @@ import AllergenModel from "Frontend/generated/cz/asen/unicorn/fridge/domain/enum
 import Location from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/operation/CreateListing/Location";
 import {Tooltip} from "@hilla/react-components/Tooltip";
 import {UserContext} from "Frontend/components/UserProvider";
+import {Notification} from '@hilla/react-components/Notification.js';
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -31,8 +32,20 @@ export default function FoodListingCreateView() {
     const { model, submit, value,  field } = useForm(CreateListingModel, {
         onSubmit: async (request) => {
             request.donor = currentUser;
-            await FoodListingEndpoint.createFoodListing(request).catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
-            navigate("/food-listings")
+            await FoodListingEndpoint.createFoodListing(request)
+                .then(result => {
+                    navigate("/food-listings");
+                    Notification.show('Listing created', {
+                        position: 'top-center',
+                        theme: 'success',
+                        duration: 3000,
+                    });
+                })
+                .catch(e => Notification.show(`Couldn't create listing. ${JSON.stringify(e)}`, {
+                    position: 'top-stretch',
+                    theme: 'error',
+                    duration: 4000,
+                }));
         }
     })
 

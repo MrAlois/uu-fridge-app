@@ -11,7 +11,7 @@ public class DomainUserMapper {
     @Contract("_ -> new")
     public static @NotNull User toDomain(@NotNull AppUserEntity userEntity) {
         return new User(
-                userEntity.getId(),
+                userEntity.getUserId(),
                 userEntity.getName(),
                 userEntity.getDefaultLocation(),
                 DomainAllergenMapper.parseAllergens(userEntity.getAllergicTo()),
@@ -23,7 +23,7 @@ public class DomainUserMapper {
     public static @NotNull AppUserEntity fromDomain(@NotNull User user) {
         final AppUserEntity appUserEntity = new AppUserEntity();
 
-        appUserEntity.setId(user.id());
+        appUserEntity.setUserId(user.id());
         appUserEntity.setName(user.name());
         appUserEntity.setDefaultLocation(user.defaultLocation());
         appUserEntity.setAllergicTo(DomainAllergenMapper.parseAllergens(user.allergens()));

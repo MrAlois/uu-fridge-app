@@ -16,7 +16,7 @@ public class AppUserEntity {
     @SequenceGenerator(name = "generator", initialValue = 10)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "generator")
     @Column(name = "USER_ID", nullable = false)
-    private Integer id;
+    private Integer userId;
 
     @Size(max = 64)
     @NotNull

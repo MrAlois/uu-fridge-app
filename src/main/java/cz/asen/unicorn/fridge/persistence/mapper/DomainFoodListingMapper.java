@@ -2,7 +2,6 @@ package cz.asen.unicorn.fridge.persistence.mapper;
 
 import cz.asen.unicorn.fridge.domain.FoodListing;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
-import cz.asen.unicorn.fridge.persistence.entity.FoodListingClaimEntity;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingEntity;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -21,21 +20,23 @@ import java.util.Optional;
 public class DomainFoodListingMapper {
 
     public static @NotNull FoodListing toDomain(@NotNull FoodListingEntity entity) {
-        return toDomain(entity, null, Collections.emptyList());
+        return toDomain(entity, Collections.emptyList());
     }
 
-    public static @NotNull FoodListing toDomain(@NotNull FoodListingEntity entity, FoodListingClaimEntity foodClaim) {
-        return toDomain(entity, foodClaim, Collections.emptyList());
-    }
+    public static @NotNull FoodListing toDomain(@NotNull FoodListingEntity entity,
+                                                Collection<String> foodListingPhotos) {
+        var claimState = Optional.ofNullable(entity.getState())
+                .map(ClaimState::valueOf)
+                .orElse(ClaimState.UNCLAIMED);
 
-    public static @NotNull FoodListing toDomain(
-            @NotNull FoodListingEntity entity,
-            FoodListingClaimEntity foodListingClaimEntity,
-            Collection<String> foodListingPhotos
-    ) {
-        final var maybeClaimEntity = Optional.ofNullable(foodListingClaimEntity);
+        var claimUser = Optional.ofNullable(entity.getClaimer())
+                .map(DomainUserMapper::toDomain);
+
+        var claimTime = Optional.ofNullable(entity.getClaimed())
+                .map(claimed -> LocalDateTime.ofInstant(claimed, ZoneId.systemDefault()));
+
         return new FoodListing(
-                entity.getId(),
+                entity.getListingId(),
                 DomainUserMapper.toDomain(entity.getDonor()),
                 entity.getShortDescription(),
                 entity.getDescription(),
@@ -45,26 +46,16 @@ public class DomainFoodListingMapper {
                 entity.getPickupLongitude(),
                 LocalDateTime.ofInstant(entity.getCreated(), ZoneId.systemDefault()),
                 DomainAllergenMapper.parseAllergens(entity.getAllergens()),
-                maybeClaimEntity
-                        .map(FoodListingClaimEntity::getState)
-                        .map(ClaimState::valueOf)
-                        .orElse(ClaimState.UNCLAIMED),
-                maybeClaimEntity
-                        .map(FoodListingClaimEntity::getUser)
-                        .map(DomainUserMapper::toDomain),
-                maybeClaimEntity
-                        .map(FoodListingClaimEntity::getClaimed)
-                        .map(instant -> LocalDateTime.ofInstant(instant, ZoneId.systemDefault())),
+                claimState,
+                claimUser,
+                claimTime,
                 foodListingPhotos != null ? new HashSet<>(foodListingPhotos) : Collections.emptySet()
         );
     }
 
-    public static @NotNull FoodListingEntity fromDomain(
-            @NotNull FoodListing domain,
-            FoodListingClaimEntity foodListingClaimEntity
-    ) {
+    public static @NotNull FoodListingEntity fromDomain(@NotNull FoodListing domain) {
         FoodListingEntity entity = new FoodListingEntity();
-        entity.setId(domain.id());
+        entity.setListingId(domain.id());
         entity.setDonor(DomainUserMapper.fromDomain(domain.donor()));
         entity.setShortDescription(domain.shortDescription());
         entity.setDescription(domain.description());
@@ -75,16 +66,14 @@ public class DomainFoodListingMapper {
         entity.setCreated(domain.created().toInstant(ZoneOffset.UTC));
         entity.setAllergens(DomainAllergenMapper.parseAllergens(domain.allergens()));
 
-        if(foodListingClaimEntity != null) {
-            foodListingClaimEntity.setState(domain.currentState().toString());
-            domain.currentClaimingUser()
-                    .map(DomainUserMapper::fromDomain)
-                    .ifPresent(foodListingClaimEntity::setUser);
+        entity.setState(domain.currentState().toString());
+        domain.currentClaimingUser()
+                .map(DomainUserMapper::fromDomain)
+                .ifPresent(entity::setClaimer);
 
-            domain.claimTime()
-                    .map(time -> time.toInstant(ZoneOffset.UTC))
-                    .ifPresent(foodListingClaimEntity::setClaimed);
-        }
+        domain.claimTime()
+                .map(time -> time.toInstant(ZoneOffset.UTC))
+                .ifPresent(entity::setClaimed);
 
         return entity;
     }

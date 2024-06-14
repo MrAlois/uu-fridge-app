@@ -36,7 +36,10 @@ export const UserProvider = ({ children }: {children: React.ReactNode}) => {
 
     const selectUserByEmail = (email: string) => {
         const foundUser = appUsers.find(user => user.email === email)
-        if (foundUser) setCurrentUser(foundUser);
+        if (foundUser) {
+            console.log(`Set user to ${email}`)
+            setCurrentUser(foundUser);
+        }
     }
 
     // Wrapping the user state and selectUserByEmail inside a useMemo to prevent unnecessary re-renders

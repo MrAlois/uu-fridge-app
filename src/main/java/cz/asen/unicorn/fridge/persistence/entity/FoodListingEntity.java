@@ -10,7 +10,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -21,7 +20,7 @@ public class FoodListingEntity {
     @SequenceGenerator(name = "generator", initialValue = 10)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "generator")
     @Column(name = "LISTING_ID", nullable = false)
-    private Integer id;
+    private Integer listingId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -34,13 +33,10 @@ public class FoodListingEntity {
     @Column(name = "SHORT_DESCRIPTION", nullable = false, length = 64)
     private String shortDescription;
 
-    @Size(max = 256)
+    @Size(max = 512)
     @NotNull
     @Column(name = "DESCRIPTION", nullable = false, length = 512)
     private String description;
-
-    @OneToMany(mappedBy = "listing", fetch = FetchType.LAZY)
-    private Set<FoodListingClaimEntity> claims;
 
     @NotNull
     @Column(name = "EXPIRY_DATE", nullable = false)
@@ -65,4 +61,18 @@ public class FoodListingEntity {
     @Size(max = 64)
     @Column(name = "ALLERGENS", length = 64)
     private String allergens;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @JoinColumn(name = "CLAIMING_USER_ID")
+    private AppUserEntity claimer;
+
+    @Column(name = "TIME_CLAIMED")
+    private Instant claimed;
+
+    @Size(max = 32)
+    @NotNull
+    @ColumnDefault("'UNCLAIMED'")
+    @Column(name = "STATE", nullable = false, length = 32)
+    private String state;
 }

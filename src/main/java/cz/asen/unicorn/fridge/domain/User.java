@@ -19,7 +19,7 @@ public record User(
         @Size(max = 64)
         String name,
 
-        @Size(max = 64)
+        @Size(max = 128)
         String defaultLocation,
 
         Set<Allergen> allergens,

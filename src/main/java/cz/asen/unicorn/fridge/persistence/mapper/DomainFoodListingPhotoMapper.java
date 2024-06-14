@@ -11,7 +11,7 @@ import java.util.List;
 public class DomainFoodListingPhotoMapper {
     public static List<FoodListingPhotoEntity> fromDomain(FoodListing foodListing){
         final var listingEntity = new FoodListingEntity();
-        listingEntity.setId(foodListing.id());
+        listingEntity.setListingId(foodListing.id());
 
         return foodListing.base64Images().stream()
                 .map(imageData -> {

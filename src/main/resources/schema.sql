@@ -1,4 +1,3 @@
-drop table if exists FOOD_LISTING_CLAIM;
 drop table if exists FOOD_LISTING_PHOTO;
 drop table if exists FOOD_LISTING;
 drop table if exists APP_USER;
@@ -31,25 +30,15 @@ create table FOOD_LISTING
     PICKUP_LNG        DOUBLE PRECISION      default 0.0               not null,
     CREATED           TIMESTAMP             default CURRENT_TIMESTAMP not null,
     ALLERGENS         CHARACTER VARYING(64),
+    CLAIMING_USER_ID  INTEGER,
+    TIME_CLAIMED      TIMESTAMP,
+    STATE             CHARACTER VARYING(32)                           not null,
     constraint FOOD_LISTING_PK
         primary key (LISTING_ID),
     constraint FOOD_LISTING_APP_USER_USER_ID_FK
-        foreign key (DONOR_ID) references APP_USER
-);
-
-create table FOOD_LISTING_CLAIM
-(
-    CLAIM_ID   INTEGER auto_increment,
-    USER_ID    INTEGER                                         not null,
-    LISTING_ID INTEGER                                         not null,
-    CLAIMED    TIMESTAMP             default CURRENT_TIMESTAMP not null,
-    STATE      CHARACTER VARYING(32) default 'WAITING'         not null,
-    constraint FOOD_LISTING_CLAIM_PK
-        primary key (CLAIM_ID),
-    constraint FOOD_LISTING_CLAIM_APP_USER_USER_ID_FK
-        foreign key (USER_ID) references APP_USER,
-    constraint FOOD_LISTING_CLAIM_FOOD_LISTING_LISTING_ID_FK
-        foreign key (LISTING_ID) references FOOD_LISTING on delete cascade
+        foreign key (DONOR_ID) references APP_USER,
+    constraint FOOD_LISTING_APP_USER_USER_ID_FK2
+        foreign key (CLAIMING_USER_ID) references APP_USER
 );
 
 create table FOOD_LISTING_PHOTO

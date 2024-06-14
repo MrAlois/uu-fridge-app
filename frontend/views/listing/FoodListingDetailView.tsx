@@ -11,6 +11,8 @@ import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/C
 import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import {Tooltip} from "@hilla/react-components/Tooltip";
 import {UserContext} from "Frontend/components/UserProvider";
+import User from "Frontend/generated/cz/asen/unicorn/fridge/domain/User";
+import {Notification} from '@hilla/react-components/Notification.js';
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -28,8 +30,38 @@ export default function FoodListingDetailView() {
     useEffect(() => {
         FoodListingEndpoint.getFoodListingById(listingId as unknown as number)
             .then((result) => setListing(result))
-            .catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
+            .catch(e => Notification.show(`Couldn't find listing. ${JSON.stringify(e)}`, {
+                position: 'top-stretch',
+                theme: 'error',
+                duration: 4000,
+            }))
     }, []);
+
+    const claimFoodListing = (listingId: number, user: User) => FoodListingEndpoint.claimListing(listingId, user)
+        .then(result => Notification.show('Listing claimed', {
+            position: 'top-center',
+            theme: 'success',
+            duration: 3000,
+        }))
+        .catch(e => Notification.show(`Couldn't claim listing. ${JSON.stringify(e)}`, {
+            position: 'top-stretch',
+            theme: 'error',
+            duration: 4000,
+        }))
+        .finally(() => navigate("/food-listings"))
+
+    const unclaimFoodListing = (listingId: number, user: User) => FoodListingEndpoint.unclaimListing(listingId, user)
+        .then(result => Notification.show('Listing unclaimed', {
+            position: 'top-center',
+            theme: 'success',
+            duration: 3000,
+        }))
+        .catch(e => Notification.show(`Couldn't unclaim listing. ${JSON.stringify(e)}`, {
+            position: 'top-stretch',
+            theme: 'error',
+            duration: 4000,
+        }))
+        .finally(() => navigate("/food-listings"))
 
     return (
         <>
@@ -41,7 +73,18 @@ export default function FoodListingDetailView() {
                 opened={removeDialogOpened}
                 onOpenedChanged={(event) => setRemoveDialogOpened(event.detail.value)}
                 onConfirm={() =>
-                    FoodListingEndpoint.deleteFoodListing(Number(listingId)).then(r => navigate("/food-listings"))
+                    FoodListingEndpoint.deleteFoodListing(Number(listingId))
+                        .then(result => Notification.show('Listing deleted', {
+                            position: 'top-center',
+                            theme: 'success',
+                            duration: 3000,
+                        }))
+                        .catch(e => Notification.show(`Couldn't delete listing. ${JSON.stringify(e)}`, {
+                            position: 'top-stretch',
+                            theme: 'error',
+                            duration: 4000,
+                        }))
+                        .finally(() => navigate("/food-listings"))
                 }
             >
                 <p>Are you sure you want to remove this listing?</p>
@@ -54,7 +97,7 @@ export default function FoodListingDetailView() {
                 confirmTheme="error primary"
                 opened={unclaimDialogOpened}
                 onOpenedChanged={(event) => setUnclaimDialogOpened(event.detail.value)}
-                onConfirm={() => console.log("Order unclaimed")}
+                onConfirm={() => unclaimFoodListing(1, currentUser)} //FIXME !!!
             >
                 <p>If you're cancelling your claim, you should contact your donor. Are you sure?</p>
                 <p className="my-4"><span>Email: </span> <a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
@@ -146,7 +189,7 @@ export default function FoodListingDetailView() {
 
                 {listing?.currentState == ClaimState.UNCLAIMED && !isCurrentUserOwner && (
                     <Tab aria-label="Claim">
-                        <NavLink to="#" onClick={() => alert("Order claimed")} tabIndex={-1}>
+                        <NavLink to="#" onClick={() => claimFoodListing(listing.id!, currentUser)} tabIndex={-1}>
                             <Icon icon="vaadin:location-arrow-circle" className={iconStyle}/>
                         </NavLink>
                         <Tooltip slot="tooltip" text="Claim" position="top" />

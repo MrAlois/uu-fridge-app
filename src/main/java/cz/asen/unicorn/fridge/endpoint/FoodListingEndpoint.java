@@ -2,8 +2,8 @@ package cz.asen.unicorn.fridge.endpoint;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import cz.asen.unicorn.fridge.domain.FoodListing;
+import cz.asen.unicorn.fridge.domain.User;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
-import cz.asen.unicorn.fridge.domain.enums.DistanceType;
 import cz.asen.unicorn.fridge.endpoint.operation.CreateListing;
 import cz.asen.unicorn.fridge.endpoint.operation.ListingSearchParameters;
 import cz.asen.unicorn.fridge.endpoint.view.FoodListingSummary;
@@ -11,6 +11,7 @@ import cz.asen.unicorn.fridge.service.FoodListingService;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.Nullable;
+import lombok.val;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,17 +37,10 @@ public class FoodListingEndpoint {
     }
 
     @Nonnull
-    public List<FoodListingSummary> searchFoodListingSummary(@Nonnull String name, @Nullable DistanceType distanceType){
-        return foodListingService.searchForListingsByNamePattern(name).stream()
-                .map(FoodListingEndpoint::transformToFoodListingSummaryView)
-                .toList();
-    }
-
-    @Nonnull
     public List<FoodListingSummary> searchFoodByParams(@Nullable ListingSearchParameters filter){
-        return filter == null
+        return filter == null || filter.owner() == null
                 ? this.getAllFoodListingSummaries()
-                : foodListingService.searchListingsByParameters(filter.namePattern(), filter.states(), filter.owner(), filter.upToExpiryDate(), filter.allergens(), filter.distanceType()).stream()
+                : foodListingService.getAllRelatedToOwner(filter.owner(), filter.namePattern(), filter.upToExpiryDate(), filter.allergens(), filter.distanceType()).stream()
                     .map(FoodListingEndpoint::transformToFoodListingSummaryView)
                     .toList();
     }
@@ -72,6 +66,28 @@ public class FoodListingEndpoint {
 
     public void deleteFoodListing(@Nonnull @NotNull Integer listingId) throws NoSuchElementException {
         foodListingService.deleteListingById(listingId);
+    }
+
+    @Nonnull
+    public FoodListing claimListing(@Nonnull @NotNull Integer id, @Nonnull @NotNull User owner){
+        val listingToUpdate = foodListingService.getListingByIdOrThrow(id).toBuilder()
+                .currentClaimingUser(Optional.of(owner))
+                .claimTime(Optional.of(LocalDateTime.now()))
+                .currentState(ClaimState.CLAIMED)
+                .build();
+
+        return foodListingService.saveListing(listingToUpdate);
+    }
+
+    @Nonnull
+    public FoodListing unclaimListing(@Nonnull @NotNull Integer id, @Nonnull @NotNull User owner){
+        val listingToUpdate = foodListingService.getListingByIdOrThrow(id).toBuilder()
+                .currentClaimingUser(Optional.empty())
+                .claimTime(Optional.empty())
+                .currentState(ClaimState.UNCLAIMED)
+                .build();
+
+        return foodListingService.saveListing(listingToUpdate);
     }
 
     @Contract("_, _ -> new")

@@ -3,11 +3,8 @@ package cz.asen.unicorn.fridge.persistence.specification;
 import cz.asen.unicorn.fridge.domain.User;
 import cz.asen.unicorn.fridge.domain.enums.Allergen;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
-import cz.asen.unicorn.fridge.persistence.entity.FoodListingClaimEntity;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -39,10 +36,9 @@ public class FoodListingSpecification {
             if (states == null || states.isEmpty()) {
                 return cb.isTrue(cb.literal(true));
             } else {
-                Join<FoodListingEntity, FoodListingClaimEntity> join = root.join("claims", JoinType.LEFT);
-                CriteriaBuilder.In<Object> inClause = cb.in(cb.coalesce(join.get("state"), ClaimState.UNCLAIMED.name()));
+                CriteriaBuilder.In<String> inClause = cb.in(root.get("state"));
                 for (ClaimState state : states) {
-                    inClause.value(state.toString());
+                    inClause.value(state.name());
                 }
                 return inClause;
             }
@@ -56,7 +52,6 @@ public class FoodListingSpecification {
                 : cb.equal(listing.get("user"), user);
     }
 
-
     @Contract(pure = true)
     public static @NotNull Specification<FoodListingEntity> hasAllergens(Set<Allergen> allergens) {
         return (root, query, cb) -> {
@@ -69,6 +64,20 @@ public class FoodListingSpecification {
                 }
                 return inClause;
             }
+        };
+    }
+
+    public static @NotNull Specification<FoodListingEntity> ownedOrClaimedByOrUnclaimed(User owner) {
+        return (root, query, cb) -> {
+            if (owner == null) {
+                return cb.equal(root.get("state"), "UNCLAIMED"); // Display all unclaimed items if no user is logged in
+            }
+
+            return cb.or(
+                    cb.equal(root.get("donor").get("userId"), owner.id()),
+                    cb.equal(root.get("claimer").get("userId"), owner.id()),
+                    cb.equal(root.get("state"), "UNCLAIMED")
+            );
         };
     }
 }

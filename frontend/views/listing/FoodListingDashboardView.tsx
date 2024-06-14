@@ -13,26 +13,28 @@ import DistanceType from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums
 import FoodListingSummary from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/view/FoodListingSummary";
 import {Tooltip} from "@hilla/react-components/Tooltip";
 import {UserContext} from "Frontend/components/UserProvider";
-import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
+import {Notification} from "@hilla/react-components/Notification";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
 export default function FoodListingDashboardView() {
     const [serverListings, setServerListings] = useState<FoodListingSummary[]>([])
 
+    const { currentUser } = useContext(UserContext);
     const [namePatternFilter, setNamePatternFilter] = useState<string | undefined>(undefined)
     const [kmFilter, setKmFilter] = useState(DistanceType.ALL);
 
-    const { currentUser } = useContext(UserContext);
-    const [ stateFilters, setStateFilters] = useState<ClaimState[] | undefined>([ClaimState.ACCEPTED]);
-
     useEffect(() => {
-        FoodListingEndpoint.searchFoodByParams({namePattern: namePatternFilter, distanceType: kmFilter, states: stateFilters})
+        FoodListingEndpoint.searchFoodByParams({owner: currentUser, namePattern: namePatternFilter, distanceType: kmFilter})
             .then((result) => {
                 let listings = result == undefined ? [] as FoodListingSummary[] : result?.filter(it => it != null)
                 setServerListings(listings as FoodListingSummary[])
             })
-            .catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
+            .catch(e => Notification.show(`Couldn't finds listings. ${JSON.stringify(e)}`, {
+                position: 'top-stretch',
+                theme: 'error',
+                duration: 4000,
+            }));
     }, [namePatternFilter, currentUser]);
 
     const areaFilterItems = [
