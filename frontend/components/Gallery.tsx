@@ -9,7 +9,7 @@ const Gallery = ({images = []} : GalleryProps) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const processedImages = useMemo(() => {
         if (images && images.length > 0) {
-            return images.map(image => image ? image : placeholderImage)
+            return images.map(image => image || placeholderImage)
         } else {
             return [placeholderImage];
         }

@@ -80,6 +80,7 @@ export default function FoodListingCreateView() {
                     <div className="mb-4 md:mb-8 flex items-center justify-between">
                         <h1 className="text-lg md:text-2xl font-semibold">Create listing</h1>
                     </div>
+
                     <VerticalLayout theme="spacing">
                         <FormLayout responsiveSteps={[
                             { minWidth: '0', columns: 1 },

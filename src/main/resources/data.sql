@@ -1,14 +1,14 @@
 -- insert data into APP_USER table
 INSERT INTO APP_USER(NAME, DEFAULT_LOCATION, DEFAULT_LAT, DEFAULT_LNG, ALLERGIC_TO, EMAIL, PHONE)
-VALUES ('John Smith', 'Old Town Square 604/14, 110 00 Prague 1 - Old Town, Czechia', 50.0874654, 14.4212535, null, 'johnsmith@email.com', '1234567890'),
-       ('Jane Doe', 'Havlíčkovo náměstí 552/1, 284 01 Kutná Hora-Vnitřní Město, Czechia ', 49.9486561, 15.2681123, 'NUTS', 'janedoe@email.com', '2345678901'),
-       ('Petr Frolík', 'Kladno, 27252 Kladno, Central Bohemian Region, Czechia', 50.1478497, 14.1025379, 'MILK,EGGS', 'maryjohnson@email.com', '3456789012'),
-       ('Robert Homeless', null, null, null, null, 'robert@addressless.com', '4567890123'),
-       ('Emma Wilson', 'Old Town Square 1/4, 110 00 Prague 1 - Old Town, Czechia ', 50.0874654, 14.4212535, 'MILK', 'emmawilson@email.com', '5678901234'),
-       ('Dave Lister', 'Čsl. armády 2125/34, 43401 Most, Czechia', 50.5105642, 13.6363306, 'MILK', 'lister@email.com', '9876543210'),
-       ('Arnold Rimmer', 'Výstavní 80/99, 703 00 Ostrava - Vítkovice, Czechia ', 49.8172847, 18.2722797, null, 'rimmer@email.com', '8765432109'),
-       ('Kryten', '9. května 1197, 73581 Bohumín - Nový Bohumín, Czechia ', 49.8992572,18.3504125, null, 'kryten@email.com', '7654321098'),
-       ('Cat', 'Dolní náměstí 21/44, 77900 Olomouc, Czechia ', 49.5922931, 17.2511658, 'FISH', 'cat@email.com', '6543210987');
+VALUES ('Alois Šenkyřík', 'Old Town Square 604/14, 110 00 Prague 1 - Old Town, Czechia', 50.0874654, 14.4212535, null, 'asenkyrik@monetplus.com', '+420 456 78 90'),
+       ('Jane Dough', 'Havlíčkovo náměstí 552/1, 284 01 Kutná Hora-Vnitřní Město, Czechia ', 49.9486561, 15.2681123, 'NUTS', 'janedough@email.com', '+230 450 678 901'),
+       ('Petr Frolík', 'Kladno, 27252 Kladno, Central Bohemian Region, Czechia', 50.1478497, 14.1025379, 'MILK,EGGS', 'petrfrolik@seznam.cz', '+420 345 678 901'),
+       ('Robert Homeless', null, null, null, null, 'robert@homeless.com', '4567890123'),
+       ('Emma Wilson', 'Old Town Square 1/4, 110 00 Prague 1 - Old Town, Czechia ', 50.0874654, 14.4212535, 'MILK', 'emmawilson@email.com', '567 890 1234'),
+       ('Dave Lister', 'Čsl. armády 2125/34, 43401 Most, Czechia', 50.5105642, 13.6363306, 'MILK', 'lister@email.com', '+411 987 654 210'),
+       ('Arnold Rimmer', 'Výstavní 80/99, 703 00 Ostrava - Vítkovice, Czechia ', 49.8172847, 18.2722797, null, 'rimmer@redwarf.com', '+411 876 543 219'),
+       ('Kryten', '9. května 1197, 73581 Bohumín - Nový Bohumín, Czechia ', 49.8992572,18.3504125, null, 'kryten@redwarf.com', '+411 765 432 109'),
+       ('Cat', 'Dolní náměstí 21/44, 77900 Olomouc, Czechia ', 49.5922931, 17.2511658, 'FISH', 'cat@redwarf.com', '+411 654 321 098');
 
 -- insert data into FOOD_LISTING table
 INSERT INTO FOOD_LISTING(DONOR_ID, SHORT_DESCRIPTION, DESCRIPTION, EXPIRY_DATE, PICKUP_LOCATION, PICKUP_LAT, PICKUP_LNG, ALLERGENS, CLAIMING_USER_ID, TIME_CLAIMED, STATE)

@@ -13,6 +13,8 @@ import {Tooltip} from "@hilla/react-components/Tooltip";
 import {UserContext} from "Frontend/components/UserProvider";
 import User from "Frontend/generated/cz/asen/unicorn/fridge/domain/User";
 import {Notification} from '@hilla/react-components/Notification.js';
+import FoodListingEditDialog from "Frontend/components/FoodListingEditDialog";
+import CreateListing from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/operation/CreateListing";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
@@ -21,6 +23,7 @@ export default function FoodListingDetailView() {
     const navigate = useNavigate()
     const [removeDialogOpened, setRemoveDialogOpened] = useState(false);
     const [unclaimDialogOpened, setUnclaimDialogOpened] = useState(false);
+    const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [listing, setListing] = useState<FoodListing>()
 
     const { currentUser } = useContext(UserContext);
@@ -37,6 +40,34 @@ export default function FoodListingDetailView() {
             }))
     }, []);
 
+    const deleteFoodListing = (listingId: number) => FoodListingEndpoint.deleteFoodListing(Number(listingId))
+        .then(result => Notification.show('Listing deleted', {
+            position: 'top-center',
+            theme: 'success',
+            duration: 3000,
+        }))
+        .catch(e => Notification.show(`Couldn't delete listing. ${JSON.stringify(e)}`, {
+            position: 'top-stretch',
+            theme: 'error',
+            duration: 4000,
+        }))
+        .finally(() => navigate("/food-listings"));
+
+    const updateFoodListing = (listing: CreateListing, listingId: number) => FoodListingEndpoint.updateFoodListing(listingId, listing)
+        .then(result => {
+            setListing(result)
+            Notification.show('Listing edited', {
+                position: 'top-center',
+                theme: 'success',
+                duration: 3000,
+            });
+        })
+        .catch(e => Notification.show(`Couldn't edit listing. ${JSON.stringify(e)}`, {
+            position: 'top-stretch',
+            theme: 'error',
+            duration: 4000,
+        }))
+
     const claimFoodListing = (listingId: number, user: User) => FoodListingEndpoint.claimListing(listingId, user)
         .then(result => Notification.show('Listing claimed', {
             position: 'top-center',
@@ -48,7 +79,7 @@ export default function FoodListingDetailView() {
             theme: 'error',
             duration: 4000,
         }))
-        .finally(() => navigate("/food-listings"))
+        .finally(() => navigate("/food-listings"));
 
     const unclaimFoodListing = (listingId: number, user: User) => FoodListingEndpoint.unclaimListing(listingId, user)
         .then(result => Notification.show('Listing unclaimed', {
@@ -61,7 +92,20 @@ export default function FoodListingDetailView() {
             theme: 'error',
             duration: 4000,
         }))
-        .finally(() => navigate("/food-listings"))
+        .finally(() => navigate("/food-listings"));
+
+    const confirmHandover = (listingId: number) => FoodListingEndpoint.confirmHandover(listingId)
+        .then(result => Notification.show('Listing claim handed over', {
+            position: 'top-center',
+            theme: 'success',
+            duration: 3000,
+        }))
+        .catch(e => Notification.show(`Couldn't hand over listing. ${JSON.stringify(e)}`, {
+            position: 'top-stretch',
+            theme: 'error',
+            duration: 4000,
+        }))
+        .finally(() => navigate("/food-listings"));
 
     return (
         <>
@@ -72,20 +116,7 @@ export default function FoodListingDetailView() {
                 confirmTheme="error primary"
                 opened={removeDialogOpened}
                 onOpenedChanged={(event) => setRemoveDialogOpened(event.detail.value)}
-                onConfirm={() =>
-                    FoodListingEndpoint.deleteFoodListing(Number(listingId))
-                        .then(result => Notification.show('Listing deleted', {
-                            position: 'top-center',
-                            theme: 'success',
-                            duration: 3000,
-                        }))
-                        .catch(e => Notification.show(`Couldn't delete listing. ${JSON.stringify(e)}`, {
-                            position: 'top-stretch',
-                            theme: 'error',
-                            duration: 4000,
-                        }))
-                        .finally(() => navigate("/food-listings"))
-                }
+                onConfirm={() => deleteFoodListing(Number(listingId))}
             >
                 <p>Are you sure you want to remove this listing?</p>
             </ConfirmDialog>
@@ -97,11 +128,13 @@ export default function FoodListingDetailView() {
                 confirmTheme="error primary"
                 opened={unclaimDialogOpened}
                 onOpenedChanged={(event) => setUnclaimDialogOpened(event.detail.value)}
-                onConfirm={() => unclaimFoodListing(1, currentUser)} //FIXME !!!
+                onConfirm={() => unclaimFoodListing(Number(listingId), currentUser)}
             >
                 <p>If you're cancelling your claim, you should contact your donor. Are you sure?</p>
                 <p className="my-4"><span>Email: </span> <a href={`mailto:${listing?.donor?.email}`}>{listing?.donor?.email}</a></p>
             </ConfirmDialog>
+
+            <FoodListingEditDialog listing={listing} isOpen={editDialogOpened} setIsOpen={setEditDialogOpened} onSubmit={(result) => updateFoodListing(result, Number(listingId))}/>
 
             <div className="p-4 mx-auto max-w-4xl">
                 <div className="flex justify-between items-start border-b pb-3 mb-3">
@@ -198,7 +231,7 @@ export default function FoodListingDetailView() {
 
                 {isCurrentUserOwner && (
                     <Tab aria-label="Edit">
-                        <NavLink to="#" onClick={() => alert("Editing listing")} tabIndex={-1}>
+                        <NavLink to="#" onClick={() => setEditDialogOpened(true)} tabIndex={-1}>
                             <Icon icon="vaadin:ellipsis-circle" className={iconStyle}/>
                         </NavLink>
                         <Tooltip slot="tooltip" text="Edit" position="top" />
@@ -214,12 +247,21 @@ export default function FoodListingDetailView() {
                     </Tab>
                 )}
 
-                {isCurrentUserClaiming && (
+                {isCurrentUserClaiming || (isCurrentUserOwner && listing?.currentState === "CLAIMED") && (
                     <Tab aria-label="Remove Claim">
                         <NavLink to="#" onClick={() => setUnclaimDialogOpened(true)} tabIndex={-1}>
                             <Icon icon="vaadin:close-circle" className={iconStyle}/>
                         </NavLink>
                         <Tooltip slot="tooltip" text="Remove Claim" position="top" />
+                    </Tab>
+                )}
+
+                {isCurrentUserOwner && listing?.currentState === "CLAIMED" && (
+                    <Tab aria-label="Confirm handover">
+                        <NavLink to="#" onClick={() => confirmHandover(Number(listingId))} tabIndex={-1}>
+                            <Icon icon="vaadin:check" className={iconStyle}/>
+                        </NavLink>
+                        <Tooltip slot="tooltip" text="Confirm Handover" position="top" />
                     </Tab>
                 )}
             </Tabs>

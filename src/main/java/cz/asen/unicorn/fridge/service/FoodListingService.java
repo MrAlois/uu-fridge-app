@@ -12,6 +12,7 @@ import cz.asen.unicorn.fridge.persistence.repository.FoodListingPhotoRepository;
 import cz.asen.unicorn.fridge.persistence.repository.FoodListingRepository;
 import cz.asen.unicorn.fridge.persistence.specification.FoodListingSpecification;
 import cz.asen.unicorn.fridge.utils.GeoUtils;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
+import static cz.asen.unicorn.fridge.domain.enums.ClaimState.CLAIMED;
+
+@Slf4j
 @Service
 public class FoodListingService {
     private final FoodListingRepository foodListingRepository;
@@ -34,42 +38,18 @@ public class FoodListingService {
         this.foodListingPhotoRepository = foodListingPhotoRepository;
     }
 
-    public FoodListing getListingByIdOrThrow(int listingId) throws NoSuchElementException {
+    public Optional<FoodListing> findListingById(int listingId) {
         return foodListingRepository.findById(listingId)
-                .map(this::fillImagesFromRepository)
+                .map(this::fillImagesFromRepository);
+    }
+
+    public FoodListing findListingByIdOrThrow(int listingId) throws NoSuchElementException {
+        return findListingById(listingId)
                 .orElseThrow(() -> new NoSuchElementException("Listing of id " + listingId + " not found"));
     }
 
-    public List<FoodListing> getAllFoodListings() {
+    public List<FoodListing> findAllFoodListings() {
         return foodListingRepository.findAll().stream()
-                .map(this::fillImagesFromRepository)
-                .toList();
-    }
-
-    public List<FoodListing> searchForListingsByNamePattern(String namePattern){
-        return foodListingRepository.findByShortDescriptionContainsIgnoreCaseOrPickupLocationContainsIgnoreCase(namePattern, namePattern).stream()
-                .map(this::fillImagesFromRepository)
-                .toList();
-    }
-
-    public List<FoodListing> getAllRelatedToOwner(
-            @NotNull User owner,
-            @Nullable String namePattern,
-            @Nullable LocalDate upToExpiryDate,
-            @Nullable Set<Allergen> allergens,
-            @Nullable DistanceType distanceType
-    ) {
-        final var allListings = foodListingRepository.findAll(
-                Specification.where(
-                        FoodListingSpecification.ownedOrClaimedByOrUnclaimed(owner)
-                                .and(FoodListingSpecification.nameContains(namePattern))
-                                .and(FoodListingSpecification.upToExpiryDate(upToExpiryDate))
-                                .and(FoodListingSpecification.hasAllergens(allergens))
-                )
-        );
-
-        return allListings.stream()
-                .filter(listing -> distanceType == null || GeoUtils.withinRadius(listing.getPickupLatitude(), listing.getPickupLongitude(), listing.getPickupLatitude(), listing.getPickupLongitude(), distanceType.getValueInMeter()))
                 .map(this::fillImagesFromRepository)
                 .toList();
     }
@@ -93,12 +73,45 @@ public class FoodListingService {
                 .orElseThrow();
     }
 
-    public void deleteListingById(int listingId) throws NoSuchElementException {
+    public void deleteListingById(int listingId) {
         foodListingRepository.deleteById(listingId);
     }
 
     /**
-     * Fills the images of a FoodListing from the repository.
+     * Retrieves a list of all FoodListings related to the specified owner based on certain criteria. Ordered by ownership and state.
+     *
+     * @param owner         The User object representing the owner.
+     * @param namePattern   Optional parameter specifying a name pattern to filter the FoodListings by.
+     * @param upToExpiryDate   Optional parameter specifying an expiry date to filter the FoodListings by.
+     * @param allergens     Optional set of allergens to filter the FoodListings by.
+     * @param distanceType  Optional parameter specifying a distance type to filter the FoodListings by location.
+     * @return A list of FoodListings related to the owner, filtered by the given criteria.
+     */
+    public List<FoodListing> findAllListingsRelatedToOwner(
+            @NotNull User owner,
+            @Nullable String namePattern,
+            @Nullable LocalDate upToExpiryDate,
+            @Nullable Set<Allergen> allergens,
+            @Nullable DistanceType distanceType
+    ) {
+        final var allListings = foodListingRepository.findAll(
+                Specification.where(
+                        FoodListingSpecification.ownedOrClaimedByOrUnclaimed(owner)
+                                .and(FoodListingSpecification.nameContains(namePattern))
+                                .and(FoodListingSpecification.upToExpiryDate(upToExpiryDate))
+                                .and(FoodListingSpecification.hasAllergens(allergens))
+                )
+        );
+
+        return allListings.stream()
+                .filter(listing -> distanceType == null || GeoUtils.withinRadius(listing.getPickupLatitude(), listing.getPickupLongitude(), listing.getPickupLatitude(), listing.getPickupLongitude(), distanceType.getValueInMeter()))
+                .sorted(((o1, o2) -> sortListingsBasedOnPriority(o1, o2, owner)))
+                .map(this::fillImagesFromRepository)
+                .toList();
+    }
+
+    /**
+     * Fills the images with a FoodListing from the repository.
      *
      * @param foodListing The FoodListingEntity to fill the images from.
      * @return The FoodListing with the images filled.
@@ -109,5 +122,40 @@ public class FoodListingService {
                 .toList();
 
         return DomainFoodListingMapper.toDomain(foodListing, foodListingPhotoEntities);
+    }
+
+    /**
+     * Compares two FoodListingEntity objects based on priority.
+     * <p>
+     * Priority is determined by the following criteria:
+     * - Listings belonging to the owner have a higher priority.
+     * - Among the owner's listings, claimed listings have a higher priority.
+     *
+     * @param o1    The first FoodListingEntity object.
+     * @param o2    The second FoodListingEntity object.
+     * @param owner The User object representing the owner.
+     * @return -1 if o1 has a higher priority than o2.
+     * 0 if both listings have the same priority.
+     * 1 if o2 has a higher priority than o1.
+     */
+    private static int sortListingsBasedOnPriority(@NotNull FoodListingEntity o1, FoodListingEntity o2, @NotNull User owner) {
+
+        // Compare owner's listings
+        boolean isFirstListingOwner = o1.getDonor().getUserId().equals(owner.id());
+        boolean isSecondListingOwner = o2.getDonor().getUserId().equals(owner.id());
+
+        if (isFirstListingOwner && !isSecondListingOwner) return -1;
+        if (!isFirstListingOwner && isSecondListingOwner) return 1;
+
+        // If both listings belong to the owner or both don't belong to the owner,
+        // compare the claim status.
+        boolean isFirstListingClaimed = o1.getState().equals(CLAIMED.name());
+        boolean isSecondListingClaimed = o2.getState().equals(CLAIMED.name());
+
+        if (isFirstListingClaimed && !isSecondListingClaimed) return -1;
+        if (!isFirstListingClaimed && isSecondListingClaimed) return 1;
+
+        // If no prioritization could be determined, consider both listings as having equal priority.
+        return 0;
     }
 }

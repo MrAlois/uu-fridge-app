@@ -28,4 +28,5 @@ vaadin:
 logging:
   level:
     org.atmosphere: warn
+    org.springframework.web.filter.CommonsRequestLoggingFilter: debug
 

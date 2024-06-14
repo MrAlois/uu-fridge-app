@@ -26,7 +26,6 @@ public class ImageCompressionUtils {
     private static final String ILLEGAL_COMPRESSION_RATIO = "Illegal compressed image quality (quality must be >= 0 and <= 1)";
     private static final String NULL_BYTES = "imageBytes cannot be null";
     private static final String IMAGE_FORMAT = "jpg";
-    private static Base64.Encoder mEncoder = null;
     private static Base64.Decoder mDecoder = null;
 
     /**

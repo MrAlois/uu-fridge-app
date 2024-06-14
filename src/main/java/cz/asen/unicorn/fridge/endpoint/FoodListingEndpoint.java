@@ -4,6 +4,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import cz.asen.unicorn.fridge.domain.FoodListing;
 import cz.asen.unicorn.fridge.domain.User;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
+import cz.asen.unicorn.fridge.endpoint.mapper.CreateListingMapper;
 import cz.asen.unicorn.fridge.endpoint.operation.CreateListing;
 import cz.asen.unicorn.fridge.endpoint.operation.ListingSearchParameters;
 import cz.asen.unicorn.fridge.endpoint.view.FoodListingSummary;
@@ -12,7 +13,6 @@ import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.Nullable;
 import lombok.val;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class FoodListingEndpoint {
 
     @Nonnull
     public List<FoodListingSummary> getAllFoodListingSummaries(){
-        return foodListingService.getAllFoodListings().stream()
+        return foodListingService.findAllFoodListings().stream()
                 .map(FoodListingEndpoint::transformToFoodListingSummaryView)
                 .toList();
     }
@@ -40,28 +40,35 @@ public class FoodListingEndpoint {
     public List<FoodListingSummary> searchFoodByParams(@Nullable ListingSearchParameters filter){
         return filter == null || filter.owner() == null
                 ? this.getAllFoodListingSummaries()
-                : foodListingService.getAllRelatedToOwner(filter.owner(), filter.namePattern(), filter.upToExpiryDate(), filter.allergens(), filter.distanceType()).stream()
+                : foodListingService.findAllListingsRelatedToOwner(filter.owner(), filter.namePattern(), filter.upToExpiryDate(), filter.allergens(), filter.distanceType()).stream()
                     .map(FoodListingEndpoint::transformToFoodListingSummaryView)
                     .toList();
     }
 
     @Nonnull
     public FoodListing getFoodListingById(int listingId) throws NoSuchElementException {
-        return foodListingService.getListingByIdOrThrow(listingId);
+        return foodListingService.findListingByIdOrThrow(listingId);
     }
 
     @Nonnull
     public FoodListing createFoodListing(@Nonnull @NotNull CreateListing request){
         return foodListingService.saveListing(
-                buildFromCreateRequest(request, null)
+                CreateListingMapper.createNewFromView(request, null)
         );
     }
 
     @Nonnull
-    public FoodListing updateFoodListing(@Nonnull @NotNull CreateListing request, Integer listingId){
+    public FoodListing updateFoodListing(@Nonnull @NotNull Integer listingId, @Nonnull @NotNull CreateListing request){
+        val listing = foodListingService.findListingByIdOrThrow(listingId);
         return foodListingService.saveListing(
-                buildFromCreateRequest(request, listingId)
+                CreateListingMapper.updateFromViewAndDomain(listingId, request, listing)
         );
+    }
+
+    @Nonnull
+    public CreateListing getEditListingData(@Nonnull @NotNull Integer listingId){
+        val listing = foodListingService.findListingByIdOrThrow(listingId);
+        return CreateListingMapper.toView(listing);
     }
 
     public void deleteFoodListing(@Nonnull @NotNull Integer listingId) throws NoSuchElementException {
@@ -69,8 +76,8 @@ public class FoodListingEndpoint {
     }
 
     @Nonnull
-    public FoodListing claimListing(@Nonnull @NotNull Integer id, @Nonnull @NotNull User owner){
-        val listingToUpdate = foodListingService.getListingByIdOrThrow(id).toBuilder()
+    public FoodListing claimListing(@Nonnull @NotNull Integer listingId, @Nonnull @NotNull User owner){
+        val listingToUpdate = foodListingService.findListingByIdOrThrow(listingId).toBuilder()
                 .currentClaimingUser(Optional.of(owner))
                 .claimTime(Optional.of(LocalDateTime.now()))
                 .currentState(ClaimState.CLAIMED)
@@ -80,8 +87,8 @@ public class FoodListingEndpoint {
     }
 
     @Nonnull
-    public FoodListing unclaimListing(@Nonnull @NotNull Integer id, @Nonnull @NotNull User owner){
-        val listingToUpdate = foodListingService.getListingByIdOrThrow(id).toBuilder()
+    public FoodListing unclaimListing(@Nonnull @NotNull Integer listingId, @Nonnull @NotNull User owner){
+        val listingToUpdate = foodListingService.findListingByIdOrThrow(listingId).toBuilder()
                 .currentClaimingUser(Optional.empty())
                 .claimTime(Optional.empty())
                 .currentState(ClaimState.UNCLAIMED)
@@ -90,26 +97,22 @@ public class FoodListingEndpoint {
         return foodListingService.saveListing(listingToUpdate);
     }
 
-    @Contract("_, _ -> new")
-    private static @NotNull FoodListing buildFromCreateRequest(@NotNull CreateListing request, Integer listingId){
-        return new FoodListing(
-                listingId,
-                request.donor(),
-                request.shortDescription(),
-                request.description(),
-                request.expiryDate().atStartOfDay(),
-                request.pickupLocation().locationName(),
-                request.pickupLocation().latitude(),
-                request.pickupLocation().longitude(),
-                LocalDateTime.now(), // Set created to now
-                request.allergens(),
-                ClaimState.UNCLAIMED,
-                Optional.empty(),
-                Optional.empty(),
-                request.base64Images()
-        );
+    @Nonnull
+    public FoodListing confirmHandover(@Nonnull @NotNull Integer listingId){
+        val listingToUpdate = foodListingService.findListingByIdOrThrow(listingId).toBuilder()
+                .claimTime(Optional.of(LocalDateTime.now()))
+                .currentState(ClaimState.FINISHED)
+                .build();
+
+        return foodListingService.saveListing(listingToUpdate);
     }
 
+    /**
+     * Transforms a FoodListing object into a FoodListingSummary object.
+     *
+     * @param foodListing The FoodListing object to be transformed.
+     * @return The transformed FoodListingSummary object.
+     */
     private static @NotNull FoodListingSummary transformToFoodListingSummaryView(@NotNull FoodListing foodListing) {
         return new FoodListingSummary(
                 foodListing.id(),

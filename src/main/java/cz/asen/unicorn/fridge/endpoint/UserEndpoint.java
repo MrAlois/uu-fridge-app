@@ -1,9 +1,7 @@
 package cz.asen.unicorn.fridge.endpoint;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import cz.asen.unicorn.fridge.domain.FoodListing;
 import cz.asen.unicorn.fridge.domain.User;
-import cz.asen.unicorn.fridge.endpoint.view.UserProfile;
 import cz.asen.unicorn.fridge.service.UserService;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
@@ -35,20 +33,5 @@ public class UserEndpoint {
             throw new IllegalArgumentException("To update, UserId cannot be empty!");
 
         return userService.saveUser(user);
-    }
-
-    @Nonnull
-    public UserProfile getUserProfileById(Integer id) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Nonnull
-    public User updateUserProfile(UserProfile userProfile) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Nonnull
-    public List<FoodListing> getClaimedFoodListingsByUserId(Integer userId){
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

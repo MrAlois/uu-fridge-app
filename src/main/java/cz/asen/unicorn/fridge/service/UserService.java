@@ -34,11 +34,6 @@ public class UserService {
                 .toList();
     }
 
-    public Optional<User> findByName(String name) {
-        return appUserRepository.findByNameIgnoreCase(name)
-                .map(DomainUserMapper::toDomain);
-    }
-
     public User saveUser(User user) throws NoSuchElementException {
         val entity = DomainUserMapper.fromDomain(user);
 

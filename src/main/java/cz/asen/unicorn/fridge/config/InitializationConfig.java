@@ -20,7 +20,11 @@ public class InitializationConfig {
             2, List.of("food_listing_images/bread_1.png", "food_listing_images/bread_2.png", "food_listing_images/bread_3.png"),
             3, List.of("food_listing_images/pie_1.png"),
             4, List.of("food_listing_images/pasta_1.png", "food_listing_images/pasta_2.png"),
-            5, List.of("food_listing_images/cookie_1.png", "food_listing_images/cookie_2.png")
+            5, List.of("food_listing_images/cookie_1.png", "food_listing_images/cookie_2.png"),
+            6, List.of("food_listing_images/quantum_soup_1.png", "food_listing_images/quantum_soup_2.png"),
+            7, List.of("food_listing_images/light_bee_honey_1.png"),
+            8, List.of("food_listing_images/android_pate_1.png"),
+            9, List.of("food_listing_images/space_weevil_1.png")
     );
 
     @Bean
