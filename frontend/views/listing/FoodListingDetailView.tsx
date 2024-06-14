@@ -26,7 +26,9 @@ export default function FoodListingDetailView() {
     const isCurrentUserClaiming = currentUser?.id === listing?.currentClaimingUser?.id;
 
     useEffect(() => {
-        FoodListingEndpoint.getFoodListingById(listingId as unknown as number).then((result) => setListing(result))
+        FoodListingEndpoint.getFoodListingById(listingId as unknown as number)
+            .then((result) => setListing(result))
+            .catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
     }, []);
 
     return (

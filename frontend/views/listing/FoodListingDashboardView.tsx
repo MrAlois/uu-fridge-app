@@ -10,34 +10,30 @@ import {Select} from "@hilla/react-components/Select";
 import {truncateText} from "Frontend/util/text-utils";
 import StateBadge from "Frontend/components/StateBadge";
 import DistanceType from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/DistanceType";
-import FoodListing from "Frontend/generated/cz/asen/unicorn/fridge/domain/FoodListing";
 import FoodListingSummary from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/view/FoodListingSummary";
 import {Tooltip} from "@hilla/react-components/Tooltip";
 import {UserContext} from "Frontend/components/UserProvider";
+import ClaimState from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/ClaimState";
 
 const iconStyle: string = "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
 export default function FoodListingDashboardView() {
     const [serverListings, setServerListings] = useState<FoodListingSummary[]>([])
-    const [searchQuery, setSearchQuery] = useState<string>()
+
+    const [namePatternFilter, setNamePatternFilter] = useState<string | undefined>(undefined)
     const [kmFilter, setKmFilter] = useState(DistanceType.ALL);
 
-    const { currentUser } = useContext(UserContext)
+    const { currentUser } = useContext(UserContext);
+    const [ stateFilters, setStateFilters] = useState<ClaimState[] | undefined>([ClaimState.ACCEPTED]);
 
     useEffect(() => {
-        if (searchQuery) {
-            FoodListingEndpoint.searchFoodListings(searchQuery, kmFilter).then((result) => {
+        FoodListingEndpoint.searchFoodByParams({namePattern: namePatternFilter, distanceType: kmFilter, states: stateFilters})
+            .then((result) => {
                 let listings = result == undefined ? [] as FoodListingSummary[] : result?.filter(it => it != null)
                 setServerListings(listings as FoodListingSummary[])
             })
-        }
-        else {
-            FoodListingEndpoint.getAllFoodListingSummaries().then((result) => {
-                let listings = result == undefined ? [] as FoodListing[] : result?.filter(it => it != null)
-                setServerListings(listings as FoodListingSummary[])
-            })
-        }
-    }, [searchQuery, currentUser]);
+            .catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
+    }, [namePatternFilter, currentUser]);
 
     const areaFilterItems = [
         { label: 'All', value: 'ALL' },
@@ -57,7 +53,7 @@ export default function FoodListingDashboardView() {
                         label="Search"
                         placeholder="Search Listings..."
                         clearButtonVisible
-                        onChange={e => setSearchQuery(e.target.value)}
+                        onChange={e => setNamePatternFilter(e.target.value)}
                     >
                         <Icon slot="prefix" icon="vaadin:search" className="mr-2" />
                     </TextField>
@@ -100,8 +96,8 @@ export default function FoodListingDashboardView() {
                     <NavLink to="/add-listing" tabIndex={-1}>
                         <Icon icon="vaadin:plus-circle" className={iconStyle}/>
                     </NavLink>
+                    <Tooltip slot="tooltip" text="Create listing" position="top" />
                 </Tab>
-                <Tooltip slot="tooltip" text="Create listing" position="top" />
             </Tabs>
         </>
     );

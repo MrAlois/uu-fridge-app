@@ -3,8 +3,12 @@ package cz.asen.unicorn.fridge.persistence.specification;
 import cz.asen.unicorn.fridge.domain.User;
 import cz.asen.unicorn.fridge.domain.enums.Allergen;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
+import cz.asen.unicorn.fridge.persistence.entity.FoodListingClaimEntity;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingEntity;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,11 +16,14 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 import java.util.Set;
 
+@UtilityClass
 public class FoodListingSpecification {
 
     @Contract(pure = true)
     public static @NotNull Specification<FoodListingEntity> nameContains(String name) {
-        return (listing, cq, cb) -> cb.like(cb.lower(listing.get("name")), "%" + name.toLowerCase() + "%");
+        return (listing, cq, cb) -> name == null
+            ? cb.conjunction()
+            : cb.like(cb.lower(listing.get("shortDescription")), "%" + name.toLowerCase() + "%");
     }
 
     @Contract(pure = true)
@@ -27,10 +34,19 @@ public class FoodListingSpecification {
     }
 
     @Contract(pure = true)
-    public static @NotNull Specification<FoodListingEntity> hasState(ClaimState state) {
-        return (listing, cq, cb) -> state == null
-                ? cb.conjunction()
-                : cb.equal(listing.get("state"), state);
+    public static @NotNull Specification<FoodListingEntity> hasState(Set<ClaimState> states) {
+        return (root, query, cb) -> {
+            if (states == null || states.isEmpty()) {
+                return cb.isTrue(cb.literal(true));
+            } else {
+                Join<FoodListingEntity, FoodListingClaimEntity> join = root.join("claims", JoinType.LEFT);
+                CriteriaBuilder.In<Object> inClause = cb.in(cb.coalesce(join.get("state"), ClaimState.UNCLAIMED.name()));
+                for (ClaimState state : states) {
+                    inClause.value(state.toString());
+                }
+                return inClause;
+            }
+        };
     }
 
     @Contract(pure = true)

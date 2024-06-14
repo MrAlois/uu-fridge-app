@@ -23,7 +23,7 @@ public class AppUserEntity {
     @Column(name = "NAME", nullable = false, length = 64)
     private String name;
 
-    @Size(max = 64)
+    @Size(max = 128)
     @Column(name = "DEFAULT_LOCATION", length = 64)
     private String defaultLocation;
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {FormLayout} from "@hilla/react-components/FormLayout";
 import {TextField} from "@hilla/react-components/TextField";
 import {VerticalLayout} from "@hilla/react-components/VerticalLayout";
@@ -19,22 +19,28 @@ import CreateListingModel from "Frontend/generated/cz/asen/unicorn/fridge/endpoi
 import Allergen from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/Allergen";
 import AllergenModel from "Frontend/generated/cz/asen/unicorn/fridge/domain/enums/AllergenModel";
 import Location from "Frontend/generated/cz/asen/unicorn/fridge/endpoint/operation/CreateListing/Location";
+import {Tooltip} from "@hilla/react-components/Tooltip";
+import {UserContext} from "Frontend/components/UserProvider";
 
 const iconStyle= "h-[var(--lumo-icon-size-s)] m-auto w-[var(--lumo-icon-size-s)]"
 
 export default function FoodListingCreateView() {
     const navigate = useNavigate();
+    const { currentUser } = useContext(UserContext)
 
     const { model, submit, value,  field } = useForm(CreateListingModel, {
         onSubmit: async (request) => {
-            await FoodListingEndpoint.createFoodListing(request)
+            request.donor = currentUser;
+            await FoodListingEndpoint.createFoodListing(request).catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`))
             navigate("/food-listings")
         }
     })
 
     const [allergenItems, setAllergenItems] = useState<Allergen[]>(Object.values(AllergenModel));
     useEffect(() => {
-        EnumerationEndpoint.getAllergens().then((allergens) => setAllergenItems(allergens));
+        EnumerationEndpoint.getAllergens()
+            .then((allergens) => setAllergenItems(allergens))
+            .catch(e => alert(`Unhandled exception! ${JSON.stringify(e)}`));
     }, []);
 
     const [locationQuery, setLocationQuery] = useState<string>('');
@@ -108,11 +114,13 @@ export default function FoodListingCreateView() {
                     <NavLink to="/food-listings">
                         <Icon icon="vaadin:arrow-circle-left" className={iconStyle}/>
                     </NavLink>
+                    <Tooltip slot="tooltip" text="Back" position="top" />
                 </Tab>
                 <Tab aria-label="Create">
                     <NavLink to="#" onClick={submit}>
                         <Icon icon="vaadin:check-square" className={iconStyle}/>
                     </NavLink>
+                    <Tooltip slot="tooltip" text="Create listing" position="top" />
                 </Tab>
             </Tabs>
         </>

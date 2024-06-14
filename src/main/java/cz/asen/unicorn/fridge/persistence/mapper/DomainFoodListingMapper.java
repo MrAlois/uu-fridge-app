@@ -1,7 +1,6 @@
 package cz.asen.unicorn.fridge.persistence.mapper;
 
 import cz.asen.unicorn.fridge.domain.FoodListing;
-import cz.asen.unicorn.fridge.domain.User;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingClaimEntity;
 import cz.asen.unicorn.fridge.persistence.entity.FoodListingEntity;
@@ -66,8 +65,7 @@ public class DomainFoodListingMapper {
     ) {
         FoodListingEntity entity = new FoodListingEntity();
         entity.setId(domain.id());
-        //entity.setDonor(DomainUserMapper.fromDomain(domain.donor()));
-        entity.setDonor(DomainUserMapper.fromDomain(new User(1, null, null, null, null, null)));
+        entity.setDonor(DomainUserMapper.fromDomain(domain.donor()));
         entity.setShortDescription(domain.shortDescription());
         entity.setDescription(domain.description());
         entity.setExpiryDate(domain.expiryDate().toInstant(ZoneOffset.UTC));

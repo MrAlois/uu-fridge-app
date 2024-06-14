@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -37,6 +38,9 @@ public class FoodListingEntity {
     @NotNull
     @Column(name = "DESCRIPTION", nullable = false, length = 512)
     private String description;
+
+    @OneToMany(mappedBy = "listing", fetch = FetchType.LAZY)
+    private Set<FoodListingClaimEntity> claims;
 
     @NotNull
     @Column(name = "EXPIRY_DATE", nullable = false)

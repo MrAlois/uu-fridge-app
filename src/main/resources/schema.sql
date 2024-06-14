@@ -7,7 +7,7 @@ create table APP_USER
 (
     USER_ID              INTEGER auto_increment,
     NAME                 CHARACTER VARYING(64)                  not null,
-    DEFAULT_LOCATION     CHARACTER VARYING(64),
+    DEFAULT_LOCATION     CHARACTER VARYING(128),
     DEFAULT_LAT          DOUBLE PRECISION      default 0.0,
     DEFAULT_LNG          DOUBLE PRECISION      default 0.0,
     ALLERGIC_TO          CHARACTER VARYING(64),

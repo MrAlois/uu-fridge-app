@@ -22,7 +22,9 @@ public record CreateListing(
         @NotNull
         Location pickupLocation,
 
+        @NotNull
         User donor,
+
         Set<Allergen> allergens,
         Set<String> base64Images
 ) implements Serializable {

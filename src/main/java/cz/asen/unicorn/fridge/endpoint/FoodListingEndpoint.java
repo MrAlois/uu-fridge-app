@@ -5,6 +5,7 @@ import cz.asen.unicorn.fridge.domain.FoodListing;
 import cz.asen.unicorn.fridge.domain.enums.ClaimState;
 import cz.asen.unicorn.fridge.domain.enums.DistanceType;
 import cz.asen.unicorn.fridge.endpoint.operation.CreateListing;
+import cz.asen.unicorn.fridge.endpoint.operation.ListingSearchParameters;
 import cz.asen.unicorn.fridge.endpoint.view.FoodListingSummary;
 import cz.asen.unicorn.fridge.service.FoodListingService;
 import dev.hilla.Endpoint;
@@ -35,10 +36,19 @@ public class FoodListingEndpoint {
     }
 
     @Nonnull
-    public List<FoodListingSummary> searchFoodListings(@Nonnull String name, @Nullable DistanceType distanceType){
-        return foodListingService.searchForListings(name).stream()
+    public List<FoodListingSummary> searchFoodListingSummary(@Nonnull String name, @Nullable DistanceType distanceType){
+        return foodListingService.searchForListingsByNamePattern(name).stream()
                 .map(FoodListingEndpoint::transformToFoodListingSummaryView)
                 .toList();
+    }
+
+    @Nonnull
+    public List<FoodListingSummary> searchFoodByParams(@Nullable ListingSearchParameters filter){
+        return filter == null
+                ? this.getAllFoodListingSummaries()
+                : foodListingService.searchListingsByParameters(filter.namePattern(), filter.states(), filter.owner(), filter.upToExpiryDate(), filter.allergens(), filter.distanceType()).stream()
+                    .map(FoodListingEndpoint::transformToFoodListingSummaryView)
+                    .toList();
     }
 
     @Nonnull

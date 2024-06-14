@@ -50,15 +50,15 @@ public class FoodListingService {
                 .toList();
     }
 
-    public List<FoodListing> searchForListings(String query){
-        return foodListingRepository.findByShortDescriptionContainsIgnoreCaseOrPickupLocationContainsIgnoreCase(query, query).stream()
+    public List<FoodListing> searchForListingsByNamePattern(String namePattern){
+        return foodListingRepository.findByShortDescriptionContainsIgnoreCaseOrPickupLocationContainsIgnoreCase(namePattern, namePattern).stream()
                 .map(this::findAndFillListingMetadata)
                 .toList();
     }
 
-    public List<FoodListing> searchListings(
-            @Nullable String name,
-            @Nullable ClaimState state,
+    public List<FoodListing> searchListingsByParameters(
+            @Nullable String namePattern,
+            @Nullable Set<ClaimState> states,
             @Nullable User owner,
             @Nullable LocalDate upToExpiryDate,
             @Nullable Set<Allergen> allergens,
@@ -66,10 +66,10 @@ public class FoodListingService {
     ) {
         final var allListings = foodListingRepository.findAll(
                 Specification.where(
-                        FoodListingSpecification.nameContains(name)
+                        FoodListingSpecification.nameContains(namePattern)
                                 .and(FoodListingSpecification.hasAllergens(allergens))
                                 .and(FoodListingSpecification.upToExpiryDate(upToExpiryDate))
-                                .and(FoodListingSpecification.hasState(state))
+                                .and(FoodListingSpecification.hasState(states))
                                 .and(FoodListingSpecification.ownedBy(owner))
                 )
         );
