@@ -47,9 +47,8 @@ export default function FoodListingDashboardView() {
 
     return (
         <>
-            <div className="mx-auto px-4 sm:px-0 w-full lg:max-w-4xl ">
-                {/* Search bar section */}
-                <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center border-gray-300 rounded-md shadow-sm mt-6 mb-6">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 2xl:px-0 w-full lg:max-w-5xl 2xl:max-w-7xl">
+                <div className="mx-auto px-4 my-7 sm:px-0 w-full md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
                     <TextField
                         className="w-full sm:w-2/3 p-2 my-2 sm:my-0"
                         label="Search"
@@ -57,7 +56,7 @@ export default function FoodListingDashboardView() {
                         clearButtonVisible
                         onChange={e => setNamePatternFilter(e.target.value)}
                     >
-                        <Icon slot="prefix" icon="vaadin:search" className="mr-2" />
+                        <Icon slot="prefix" icon="vaadin:search" className="mr-2"/>
                     </TextField>
                     <Select
                         label="Distance filter"
@@ -69,7 +68,8 @@ export default function FoodListingDashboardView() {
                 </div>
 
                 {/* Listing content section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-auto">
+                <div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-6 2xl:gap-10 mx-auto">
                     {serverListings.map((listing: FoodListingSummary) => (
                         <div key={listing.id}
                              className="flex flex-col border overflow-hidden rounded-md items-stretch w-full max-w-xs p-4 mx-auto">
@@ -83,17 +83,22 @@ export default function FoodListingDashboardView() {
                             <Gallery images={listing?.base64Images}/>
 
                             <div className="text-sm">
-                                <p className="mb-2 mt-4"><strong>Donor:</strong> {listing?.donorName} {listing?.donorId === currentUser.id ? <span {...{ theme: 'badge success' }}>You</span> : ""}</p>
-                                <p className="mb-2"><strong>Expires on:</strong> {new Date(listing?.expiryDate).toDateString()}</p>
+                                <p className="mb-2 mt-4">
+                                    <strong>Donor:</strong> {listing?.donorName} {listing?.donorId === currentUser.id ?
+                                    <span {...{theme: 'badge success'}}>You</span> : ""}</p>
+                                <p className="mb-2"><strong>Expires
+                                    on:</strong> {new Date(listing?.expiryDate).toDateString()}</p>
                                 <p className="mb-2"><strong>Address:</strong> {listing.pickupLocation}</p>
-                                <p className="mb-2"><strong>State:</strong> <StateBadge state={listing.currentState}/></p>
+                                <p className="mb-2"><strong>State:</strong> <StateBadge state={listing.currentState}/>
+                                </p>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs" className="w-full bottom-0 lg:flex lg:justify-center lg:gap-6">
+            <Tabs slot="navbar touch-optimized" theme="minimal equal-width-tabs"
+                  className="w-full bottom-0 lg:flex lg:justify-center lg:gap-6">
                 <Tab aria-label="Create">
                     <NavLink to="/add-listing" tabIndex={-1}>
                         <Icon icon="vaadin:plus-circle" className={iconStyle}/>

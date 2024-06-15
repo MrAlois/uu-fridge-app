@@ -250,7 +250,7 @@ export default function FoodListingDetailView() {
                 {isCurrentUserClaiming || (isCurrentUserOwner && listing?.currentState === "CLAIMED") && (
                     <Tab aria-label="Remove Claim">
                         <NavLink to="#" onClick={() => setUnclaimDialogOpened(true)} tabIndex={-1}>
-                            <Icon icon="vaadin:close-circle" className={iconStyle}/>
+                            <Icon icon="vaadin:close" className={iconStyle}/>
                         </NavLink>
                         <Tooltip slot="tooltip" text="Remove Claim" position="top" />
                     </Tab>

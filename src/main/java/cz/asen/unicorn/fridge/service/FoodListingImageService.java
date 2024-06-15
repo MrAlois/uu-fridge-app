@@ -29,7 +29,7 @@ public class FoodListingImageService {
      * @param listingId The ID of the food listing.
      * @param base64Images The list of base64-encoded images.
      */
-    public void saveAllBase64lImages(Integer listingId, @NotNull List<String> base64Images){
+    public void saveAllBase64Images(Integer listingId, @NotNull List<String> base64Images){
         final var foodListing = new FoodListingEntity();
         foodListing.setListingId(listingId);
 
@@ -40,7 +40,14 @@ public class FoodListingImageService {
         foodListingPhotoRepository.saveAll(imageEntities);
     }
 
-    private @NotNull FoodListingPhotoEntity saveImage(FoodListingEntity listingEntity, @NotNull String base64Image){
+    /**
+     * Saves an image associated with a food listing.
+     *
+     * @param listingEntity The food listing entity.
+     * @param base64Image The base64-encoded image.
+     * @return The saved food listing photo entity.
+     */
+    public @NotNull FoodListingPhotoEntity saveImage(FoodListingEntity listingEntity, @NotNull String base64Image){
         final var foodListingPhoto = new FoodListingPhotoEntity();
 
         // Compress the image, if it's too large
